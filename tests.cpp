@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/04 10:21:16 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/05 12:09:42 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/05 19:31:32 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ int main()
 	std::vector<int> test;
 
 	std::cout << "Empty ? " << test.empty() << " / Capacity : " << test.capacity() << " / Size : " << test.size() << std::endl;
-		test.push_back(1);
 	for (size_t i = 0; i < 51; i++)
 	{
 		test.push_back(1);
@@ -31,7 +30,7 @@ int main()
 	std::cout << "s: " << test.size() << ", c: " << test.capacity() << std::endl;
 	test.resize(100);
 	std::cout << "s: " << test.size() << ", c: " << test.capacity() << std::endl;
-	test.resize(170);
+	test.resize(4170);
 	std::cout << "s: " << test.size() << ", c: " << test.capacity() << std::endl;
 	test.resize(171, 12);
 	std::cout << "s: " << test.size() << ", c: " << test.capacity() << std::endl;

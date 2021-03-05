@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/05 15:48:02 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/05 19:34:12 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,14 @@ class vector
 
 		explicit vector (size_type n, const value_type& val = value_type(),
 		const allocator_type& alloc = allocator_type())
+		: _value(0), _size(0), _capacity(0)
 		{ assign(n, val); 		(void)alloc; } //??
 
-		template <class InputIterator>
-		vector (InputIterator first, InputIterator last,
-		const allocator_type& alloc = allocator_type())
-		{ assign(first, last); 		(void)alloc; } //??
+		// template <class InputIterator>
+		// vector (InputIterator first, InputIterator last,
+		// const allocator_type& alloc = allocator_type())
+		// : _value(0), _size(0), _capacity(0)
+		// { assign(first, last); 		(void)alloc; } //??
 
 		vector (const vector& x) // alloc here?
 		{ *this = x; }
@@ -65,7 +67,6 @@ class vector
 			for (size_t i = 0; i < _size; i++)
 				_value[i] = x[i];
 		}
-
 		iterator begin (void)
 		{ return &_value[0]; }
 		const_iterator begin (void) const
@@ -94,7 +95,7 @@ class vector
 			else if (n > _size)
 			{
 				if (n > _capacity)
-					reserve(n);
+					reserve(_size * 2 > n ? _size * 2 : n);
 				for (size_t i = _size; i < n; i++)
 					_value[i] = val;
 			}
@@ -103,7 +104,7 @@ class vector
 		size_type capacity (void) const
 		{ return _capacity; }
 		bool empty (void) const
-		{ return (_size != 0);}
+		{ return (_size == 0);}
 		void reserve (size_type n)
 		{
 			if (n > _capacity)
@@ -142,7 +143,6 @@ class vector
 		void assign (InputIterator first, InputIterator last)
 		{
 			size_t	len = last - first;
-			
 			if (_capacity && _capacity < len)
 			{
 				delete[] _value;
@@ -158,10 +158,12 @@ class vector
 		}
 		void assign (size_type n, const value_type& val)
 		{
-			if (_capacity && _capacity < n)
+			if (_capacity < n)
 			{
-				delete[] _value;
+				if (_capacity)
+					delete[] _value;
 				_value = new value_type[n];
+				_capacity = n;
 			}
 			for (size_t i = 0; i < n; i++)
 			{
@@ -192,28 +194,29 @@ class vector
 		{
 			if (_capacity < _size + n)
 				reserve(_size + n);
-			for (iterator it = end(); it != position + n - 1; it--)
+			for (iterator it = end() + n - 1; it != position + n - 1; it--)
 				*it = *(it - n);
 			for (iterator it = position; it != position + n; it++)
 				*it = val;
+			(void)val;
 			_size += n;
 		}
-		template <class InputIterator>
-		void insert (iterator position, InputIterator first, InputIterator last)
-		{
-			size_t	len = last - first;
+		// template <class InputIterator>
+		// void insert (iterator position, InputIterator first, InputIterator last)
+		// {
+		// 	size_t	len = last - first;
 			
-			if (_capacity < _size + len)
-				reserve(_size + len);
-			for (iterator it = end(); it != position + len - 1; it--)
-				*it = *(it - len);
-			for (iterator it = position; it != position + len; it++)
-			{
-				*it = first;
-				first++;
-			}
-			_size += len;
-		}
+		// 	if (_capacity < _size + len)
+		// 		reserve(_size + len);
+		// 	for (iterator it = end(); it != position + len - 1; it--)
+		// 		*it = *(it - len);
+		// 	for (iterator it = position; it != position + len; it++)
+		// 	{
+		// 		*it = first;
+		// 		first++;
+		// 	}
+		// 	_size += len;
+		// }
 		iterator erase (iterator position)
 		{
 			for (size_t i = position; i < _size - 1; i++)
