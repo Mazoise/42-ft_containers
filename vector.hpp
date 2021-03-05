@@ -6,43 +6,48 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/04 16:56:48 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/05 15:48:02 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 
-template < class T, class Alloc = allocator<T> >
+#include "randomAccessIterator.hpp"
+
+namespace ft
+{
+
+template < class T, class Alloc = std::allocator<T> >
 class vector
 {
 	public :
 
-		typedef T											value_type;
-		typedef Alloc										allocator_type;
-		typedef std::size_t									size_type;
-		typedef srd::ptrdiff_t								difference_type;
-		typedef Alloc::reference							reference;
-		typedef Alloc::const_reference						const_reference;
-		typedef Alloc::pointer								pointer;
-		typedef Alloc::const_pointer						const_pointer;
-		typedef random_access_iterator<value_type>			iterator;
-		typedef random_access_iterator<const value_type>	const_iterator;
-		typedef std::reverse_iterator<iterator>				reverse_iterator;
-		typedef std::reverse_iterator<const_iterator>		const_reverse_iterator;
+		typedef T													value_type;
+		typedef Alloc												allocator_type;
+		typedef std::size_t											size_type;
+		typedef std::ptrdiff_t										difference_type;
+		typedef value_type&											reference;
+		typedef const value_type&									const_reference;
+		typedef value_type*											pointer;
+		typedef const value_type*									const_pointer;
+		typedef typename ft::randomAccessIterator<value_type>		iterator;
+		typedef typename ft::randomAccessIterator<const value_type>	const_iterator;
+		typedef std::reverse_iterator<iterator>						reverse_iterator;
+		typedef std::reverse_iterator<const_iterator>				const_reverse_iterator;
 
 		explicit vector (const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0)
-		{}
+		{ (void)alloc; } //??
 
 		explicit vector (size_type n, const value_type& val = value_type(),
 		const allocator_type& alloc = allocator_type())
-		{ assign(n, val); }
+		{ assign(n, val); 		(void)alloc; } //??
 
 		template <class InputIterator>
 		vector (InputIterator first, InputIterator last,
 		const allocator_type& alloc = allocator_type())
-		{ assign(first, last); }
+		{ assign(first, last); 		(void)alloc; } //??
 
 		vector (const vector& x) // alloc here?
 		{ *this = x; }
@@ -56,7 +61,7 @@ class vector
 				delete[] _value;
 			_size = x.size();
 			_capacity = x.capacity();
-			new T[_capacity];
+			new value_type[_capacity];
 			for (size_t i = 0; i < _size; i++)
 				_value[i] = x[i];
 		}
@@ -80,12 +85,12 @@ class vector
 
 		size_type size (void) const
 		{ return _size; }
-		size_type max_size (void) const
-		{ return allocator.max_size(); }
+		// size_type max_size (void) const
+		// { return Alloc.max_size(); }
 		void resize (size_type n, value_type val = value_type())
 		{
 			if (n < _size)
-				erase(&_value[n], end());
+				_size = n;
 			else if (n > _size)
 			{
 				if (n > _capacity)
@@ -98,12 +103,12 @@ class vector
 		size_type capacity (void) const
 		{ return _capacity; }
 		bool empty (void) const
-		{ return (_size != 0)}
+		{ return (_size != 0);}
 		void reserve (size_type n)
 		{
 			if (n > _capacity)
 			{
-				T*		tmp = new T[n];
+				value_type*		tmp = new value_type[n];
 
 				if (_capacity)
 				{
@@ -141,7 +146,7 @@ class vector
 			if (_capacity && _capacity < len)
 			{
 				delete[] _value;
-				_value = new T[len];
+				_value = new value_type[len];
 			}
 			size_t	i = 0;
 			for (InputIterator it = first; it != last; it++)
@@ -156,27 +161,32 @@ class vector
 			if (_capacity && _capacity < n)
 			{
 				delete[] _value;
-				_value = new T[n];
+				_value = new value_type[n];
 			}
 			for (size_t i = 0; i < n; i++)
 			{
 				_value[i] = val;
-				first++;
 			}
 			_size = n;
 		}
 		void push_back (const value_type& val)
-		{ insert(end(), val); }
+		{
+			if (_capacity <= _size)
+				reserve(_size == 0 ? 1 : _size * 2);
+			_value[_size] = val;
+			_size++;
+		}
 		void pop_back (void)
-		{ erase(end()); }
+		{ erase(end() - 1); }
 		iterator insert (iterator position, const value_type& val)
 		{
 			if (_capacity <= _size)
-				reserve(_size >> 2);
+				reserve(_size == 0 ? 1 : _size * 2);
 			for (iterator it = end(); it != position; it--)
 				*it = *(it - 1);
 			*position = val;
 			_size++;
+			return (position);
 		}
 		void insert (iterator position, size_type n, const value_type& val)
 		{
@@ -209,59 +219,61 @@ class vector
 			for (size_t i = position; i < _size - 1; i++)
 				_value[i] = _value[i + 1];
 			_size--;
+			return (position);
 		}
 		iterator erase (iterator first, iterator last)
 		{
 			size_t	len = last - first;
 
-			for (iterator it = first; it < last; it++)
+			for (iterator it = first; it != last; it++)
 				*it = *(it + len);
 			_size -= len;
+			return (first);
 		}
-		void swap (vector& x)
-		{
-			iterator	it2 = end();
-			T			tmp;
+		// void swap (vector& x) //swap with other vector !
+		// {
+		// 	iterator	it2 = end();
+		// 	value_type*	tmp;
 	
-			for (iterator it = begin(); it <= begin() + (_size / 2); it++)
-			{
-				tmp = *it;
-				*it = *it2;
-				*it2 = tmp;
-				it2--;
-			}
-		}
-		void clear (void)
+		// 	for (iterator it = begin(); it <= begin() + (_size / 2); it++)
+		// 	{
+		// 		tmp = *it;
+		// 		*it = *it2;
+		// 		*it2 = tmp;
+		// 		it2--;
+		// 	}
+		// }
+		void clear (void) //destroy?
 		{
 			_size = 0;
 		}
 
-		template <class T, class Alloc>
-		bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		{}
-		template <class T, class Alloc>
-		bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		{}
-		template <class T, class Alloc>
-		bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		{}
-		template <class T, class Alloc>
-		bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		{}
-		template <class T, class Alloc>
-		bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		{}
-		template <class T, class Alloc>
-		bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		{}
+		// template <class T, class Alloc>
+		// bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+		// {}
+		// template <class T, class Alloc>
+		// bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+		// {}
+		// template <class T, class Alloc>
+		// bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+		// {}
+		// template <class T, class Alloc>
+		// bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+		// {}
+		// template <class T, class Alloc>
+		// bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+		// {}
+		// template <class T, class Alloc>
+		// bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+		// {}
 
-		template <class T, class Alloc>
-		void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
-		{}
+		// template <class T, class Alloc>
+		// void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+		// {}
 
 	private :
 
-		T*													_value;
+		value_type*													_value;
 		size_t												_size;
 		size_t												_capacity;
 };
@@ -286,5 +298,7 @@ class vector
 // 	template <class T> struct hash;
 // 	template <class Alloc> struct hash <vector<bool,Alloc>>;
 // }
+
+}
 
 #endif

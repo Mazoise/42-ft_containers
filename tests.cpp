@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/04 10:21:16 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/04 15:53:27 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/05 12:09:42 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ int main()
 	std::vector<int> test;
 
 	std::cout << "Empty ? " << test.empty() << " / Capacity : " << test.capacity() << " / Size : " << test.size() << std::endl;
+		test.push_back(1);
 	for (size_t i = 0; i < 51; i++)
 	{
 		test.push_back(1);
