@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/05 19:34:12 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/09 20:33:51 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define VECTOR_HPP
 
 #include "randomAccessIterator.hpp"
+#include "enableIf.hpp"
 
 namespace ft
 {
@@ -45,11 +46,11 @@ class vector
 		: _value(0), _size(0), _capacity(0)
 		{ assign(n, val); 		(void)alloc; } //??
 
-		// template <class InputIterator>
-		// vector (InputIterator first, InputIterator last,
-		// const allocator_type& alloc = allocator_type())
-		// : _value(0), _size(0), _capacity(0)
-		// { assign(first, last); 		(void)alloc; } //??
+		template <class InputIterator>
+		vector (InputIterator first, typename ft::enable_if<InputIterator::input_iter, InputIterator>::type last,
+		const allocator_type& alloc = allocator_type())
+		: _value(0), _size(0), _capacity(0)
+		{ assign(first, last); 		(void)alloc; } //??
 
 		vector (const vector& x) // alloc here?
 		{ *this = x; }
@@ -62,10 +63,11 @@ class vector
 			if (_capacity)
 				delete[] _value;
 			_size = x.size();
-			_capacity = x.capacity();
-			new value_type[_capacity];
+			_capacity = x.size();
+			_value = new value_type[_size]; //not same capacity !
 			for (size_t i = 0; i < _size; i++)
 				_value[i] = x[i];
+			return (*this);
 		}
 		iterator begin (void)
 		{ return &_value[0]; }
@@ -140,7 +142,7 @@ class vector
 		{ return _value[_size - 1]; }
 
 		template <class InputIterator>
-		void assign (InputIterator first, InputIterator last)
+		void assign (InputIterator first, typename ft::enable_if<InputIterator::input_iter, InputIterator>::type last)
 		{
 			size_t	len = last - first;
 			if (_capacity && _capacity < len)
@@ -201,22 +203,22 @@ class vector
 			(void)val;
 			_size += n;
 		}
-		// template <class InputIterator>
-		// void insert (iterator position, InputIterator first, InputIterator last)
-		// {
-		// 	size_t	len = last - first;
+		template <class InputIterator>
+		void insert (iterator position, InputIterator first, typename ft::enable_if<InputIterator::input_iter, InputIterator>::type last)
+		{
+			size_t	len = last - first;
 			
-		// 	if (_capacity < _size + len)
-		// 		reserve(_size + len);
-		// 	for (iterator it = end(); it != position + len - 1; it--)
-		// 		*it = *(it - len);
-		// 	for (iterator it = position; it != position + len; it++)
-		// 	{
-		// 		*it = first;
-		// 		first++;
-		// 	}
-		// 	_size += len;
-		// }
+			if (_capacity < _size + len)
+				reserve(_size + len);
+			for (iterator it = end(); it != position + len - 1; it--)
+				*it = *(it - len);
+			for (iterator it = position; it != position + len; it++)
+			{
+				*it = first;
+				first++;
+			}
+			_size += len;
+		}
 		iterator erase (iterator position)
 		{
 			for (size_t i = position; i < _size - 1; i++)
@@ -233,19 +235,22 @@ class vector
 			_size -= len;
 			return (first);
 		}
-		// void swap (vector& x) //swap with other vector !
-		// {
-		// 	iterator	it2 = end();
-		// 	value_type*	tmp;
-	
-		// 	for (iterator it = begin(); it <= begin() + (_size / 2); it++)
-		// 	{
-		// 		tmp = *it;
-		// 		*it = *it2;
-		// 		*it2 = tmp;
-		// 		it2--;
-		// 	}
-		// }
+		void swap (vector& x) //swap with other vector !
+		{
+			value_type*		tmp_value;
+			size_t			tmp;
+
+			tmp = _capacity;
+			_capacity = x._capacity;
+			x._capacity = tmp;
+			tmp = _size;
+			_size = x._size;
+			x._size = tmp;
+			tmp_value = _value;
+			_value = x._value;
+			x._value = tmp_value;
+		}
+
 		void clear (void) //destroy?
 		{
 			_size = 0;

@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/05 19:30:32 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/09 20:34:02 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,4 +57,19 @@ int main()
 	std::cout << "s: " << test4.size() << ", c: " << test4.capacity() << std::endl;
 	test4.reserve(1025300999);
 	std::cout << "s: " << test4.size() << ", c: " << test4.capacity() << std::endl;
+	ft::vector<int> test5(test);
+	std::cout << "s: " << test5.size() << ", c: " << test5.capacity() << std::endl;
+	test4.swap(test3);
+	for (size_t i = 0; i < test4.size(); i++)
+	{
+		std::cout << "s: " << test4.size() << ", c: " << test4.capacity() << " / ";
+		if (!(i % 10))
+			std::cout << std::endl;
+	}
+	for (size_t i = 0; i < test3.size(); i++)
+	{
+		std::cout << "s: " << test3.size() << ", c: " << test3.capacity() << " / ";
+		if (!(i % 10))
+			std::cout << std::endl;
+	}
 }
