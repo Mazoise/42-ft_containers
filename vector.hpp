@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/09 20:33:51 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/15 23:35:57 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,13 @@ class vector
 		explicit vector (size_type n, const value_type& val = value_type(),
 		const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0)
-		{ assign(n, val); 		(void)alloc; } //??
+		{ assign(n, val); (void)alloc; } //??
 
 		template <class InputIterator>
 		vector (InputIterator first, typename ft::enable_if<InputIterator::input_iter, InputIterator>::type last,
 		const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0)
-		{ assign(first, last); 		(void)alloc; } //??
+		{ assign(first, last); (void)alloc; } //??
 
 		vector (const vector& x) // alloc here?
 		{ *this = x; }
@@ -88,8 +88,8 @@ class vector
 
 		size_type size (void) const
 		{ return _size; }
-		// size_type max_size (void) const
-		// { return Alloc.max_size(); }
+		size_type max_size (void) const
+		{ return (4611686018427387903); } // ?
 		void resize (size_type n, value_type val = value_type())
 		{
 			if (n < _size)
@@ -165,6 +165,7 @@ class vector
 				if (_capacity)
 					delete[] _value;
 				_value = new value_type[n];
+				// _value = reinterpret_cast<value_type*>(operator new(sizeof(value_type) * n));
 				_capacity = n;
 			}
 			for (size_t i = 0; i < n; i++)
@@ -281,7 +282,7 @@ class vector
 
 	private :
 
-		value_type*													_value;
+		value_type*											_value;
 		size_t												_size;
 		size_t												_capacity;
 };

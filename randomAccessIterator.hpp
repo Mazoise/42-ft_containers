@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/05 19:42:54 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/11 13:21:01 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,6 @@ class randomAccessIterator : public std::iterator<std::random_access_iterator_ta
 		}
 		randomAccessIterator		operator++(int rhs)
 		{
-			// std::cout << "TEST+" << rhs << std::endl;
 			(void)rhs;
 			++_value;
 			return (*this);
@@ -100,7 +99,6 @@ class randomAccessIterator : public std::iterator<std::random_access_iterator_ta
 		}
 		randomAccessIterator		operator--(int rhs)
 		{
-			// std::cout << "TEST-" << rhs << std::endl;
 			(void)rhs;
 			--_value;
 			return (*this);
