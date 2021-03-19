@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/15 19:29:50 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/19 17:40:30 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,4 +117,5 @@ int main()
 		if (!(i % 10) && i != 0)
 			std::cout << std::endl;
 	}
+	std::cout << test2.max_size() << std::endl;
 }

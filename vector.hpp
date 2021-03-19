@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/15 23:35:57 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/19 18:12:19 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define VECTOR_HPP
 
 #include "randomAccessIterator.hpp"
+#include "reverseIterator.hpp"
 #include "enableIf.hpp"
 
 namespace ft
@@ -34,8 +35,8 @@ class vector
 		typedef const value_type*									const_pointer;
 		typedef typename ft::randomAccessIterator<value_type>		iterator;
 		typedef typename ft::randomAccessIterator<const value_type>	const_iterator;
-		typedef std::reverse_iterator<iterator>						reverse_iterator;
-		typedef std::reverse_iterator<const_iterator>				const_reverse_iterator;
+		typedef ft::reverseIterator<iterator>						reverse_iterator;
+		typedef ft::reverseIterator<const_iterator>					const_reverse_iterator;
 
 		explicit vector (const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0)
@@ -74,13 +75,13 @@ class vector
 		const_iterator begin (void) const
 		{ return &_value[0]; }
 		iterator end (void)
-		{ return &_value[_size - 1]; }
+		{ return &_value[_size]; }
 		const_iterator end (void) const
-		{ return &_value[_size - 1]; }
+		{ return &_value[_size]; }
 		reverse_iterator rbegin (void)
-		{ return &_value[_size - 1]; }
+		{ return &_value[_size]; }
 		const_reverse_iterator rbegin (void) const
-		{ return &_value[_size - 1]; }
+		{ return &_value[_size]; }
 		reverse_iterator rend (void)
 		{ return &_value[0]; }
 		const_reverse_iterator rend (void) const
