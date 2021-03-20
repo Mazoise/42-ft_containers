@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/20 11:09:56 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/20 19:12:10 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ class vector
 		{ assign(n, val); (void)alloc; } //??
 
 		template <class InputIterator>
-		vector (InputIterator first, typename ft::enable_if<InputIterator::input_iter, InputIterator>::type last,
+		vector (InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last,
 		const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0)
 		{ assign(first, last); (void)alloc; } //??
@@ -143,7 +143,7 @@ class vector
 		{ return _value[_size - 1]; }
 
 		template <class InputIterator>
-		void assign (InputIterator first, typename ft::enable_if<InputIterator::input_iter, InputIterator>::type last)
+		void assign (InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last)
 		{
 			size_t	len = last - first;
 			if (_capacity && _capacity < len)
@@ -206,7 +206,7 @@ class vector
 			_size += n;
 		}
 		template <class InputIterator>
-		void insert (iterator position, InputIterator first, typename ft::enable_if<InputIterator::input_iter, InputIterator>::type last)
+		void insert (iterator position, InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last)
 		{
 			size_t	len = last - first;
 			

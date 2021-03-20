@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/20 11:21:12 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/20 19:18:30 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,5 +137,12 @@ int main()
 		if (!(i % 10) && i != 0)
 			std::cout << std::endl;
 	}
-	std::cout << test2.max_size() << std::endl;
+	ft::vector<int> test7(test4.begin(), test4.end());
+	for (size_t i = 0; i < test7.size(); i++)
+	{
+		std::cout << "s: " << test7.size() << ", c: " << test7.capacity() << " / ";
+		std::cout << "value: " << test7[i] << " / ";
+		if (!(i % 10) && i != 0)
+			std::cout << std::endl;
+	}
 }

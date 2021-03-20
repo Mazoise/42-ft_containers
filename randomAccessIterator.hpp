@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/11 13:21:01 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/20 19:25:54 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ namespace ft
 {
 
 template < class T>
-class randomAccessIterator : public std::iterator<std::random_access_iterator_tag, T>
+class randomAccessIterator // : public std::iterator<std::random_access_iterator_tag, T>
 {
 	public :
 
