@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/19 18:12:19 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/20 11:09:56 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,13 +79,13 @@ class vector
 		const_iterator end (void) const
 		{ return &_value[_size]; }
 		reverse_iterator rbegin (void)
-		{ return &_value[_size]; }
+		{ return &_value[_size - 1]; }
 		const_reverse_iterator rbegin (void) const
-		{ return &_value[_size]; }
+		{ return &_value[_size - 1]; }
 		reverse_iterator rend (void)
-		{ return &_value[0]; }
+		{ return &_value[-1]; }
 		const_reverse_iterator rend (void) const
-		{ return &_value[0]; }
+		{ return &_value[-1]; }
 
 		size_type size (void) const
 		{ return _size; }

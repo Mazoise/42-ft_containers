@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/19 17:40:30 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/20 11:21:12 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ int main()
 	std::cout << "Empty ? " << test.empty() << " / Capacity : " << test.capacity() << " / Size : " << test.size() << std::endl;
 	for (size_t i = 0; i < 51; i++)
 	{
-		test.push_back(1);
+		test.push_back(i);
 		std::cout << "s: " << test.size() << ", c: " << test.capacity() << " / ";
 		if (!(i % 10) && i != 0)
 			std::cout << std::endl;
@@ -87,12 +87,32 @@ int main()
 	ft::vector<int> test5(test);
 	std::cout << "s: " << test5.size() << ", c: " << test5.capacity() << std::endl;
 	test4.swap(test3);
-	for (size_t i = 0; i < test4.size(); i++)
+	ft::vector<int>::iterator		beg6 = test4.begin();
+	ft::vector<int>::iterator		end6 = test4.end();
+	for (ft::vector<int>::iterator it = beg6; it != end6; it++)
 	{
-		std::cout << "s: " << test4.size() << ", c: " << test4.capacity() << " / ";
-		if (!(i % 10) && i != 0)
+		std::cout << *it << " / ";
+		if (!((it - beg6) % 10) && it != beg6)
 			std::cout << std::endl;
 	}
+	std::cout << std::endl;
+	ft::vector<int>::iterator		beg0 = test.begin();
+	ft::vector<int>::iterator		end0 = test.end();
+	for (ft::vector<int>::iterator it = beg0; it != end0; it++)
+	{
+		std::cout << *it << " / ";
+		if (!((it - beg0) % 10) && it != beg0)
+			std::cout << std::endl;
+	}
+	std::cout << std::endl;
+	ft::vector<int>::reverse_iterator		revbeg0 = test.rbegin();
+	for (ft::vector<int>::reverse_iterator it = revbeg0; it != test.rend(); it++)
+	{
+		std::cout << *it << " / ";
+		if (!((revbeg0 - it) % 10) && it != revbeg0)
+			std::cout << std::endl;
+	}
+	std::cout << std::endl;
 	for (size_t i = 0; i < test3.size(); i++)
 	{
 		std::cout << "s: " << test3.size() << ", c: " << test3.capacity() << " / ";
