@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/21 17:42:41 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/21 17:54:29 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,7 +246,7 @@ class vector
 		iterator erase (iterator position)
 		{
 			for (iterator it = position; it != end() - 1; it++)
-				*it = *it + 1;
+				*it = *(it + 1);
 			_size--;
 			return (position);
 		}

@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/20 19:25:54 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/21 18:30:58 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,18 @@ class randomAccessIterator // : public std::iterator<std::random_access_iterator
 	public :
 
 		typedef T																				value_type;
-		typedef typename std::iterator<std::random_access_iterator_tag, T>::difference_type		difference_type;
+		typedef typename std::iterator<std::random_access_iterator_tag, T>::difference_type		difference_type; //?
 
 		randomAccessIterator(void) : _value(0) {}
 		randomAccessIterator(value_type* value) : _value(value) {}
 		randomAccessIterator(const randomAccessIterator& rhs) : _value(rhs._value) {}
 		virtual ~randomAccessIterator(void) {}
+
+		operator randomAccessIterator<const T>()
+		{
+			return randomAccessIterator<const T>(*_value);
+		}
+
 		randomAccessIterator&		operator=(value_type* rhs)
 		{
 			_value = rhs;
