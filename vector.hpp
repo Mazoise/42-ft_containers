@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/21 11:49:04 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/21 15:55:19 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,10 @@ class vector
 		vector (InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last,
 		const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0)
-		{ assign(first, last); (void)alloc; } //??
+		{ assign(first, last); (void)alloc; }
 
-		vector (const vector& x) // alloc here?
+		vector (const vector& x)
+		: _value(0), _size(0), _capacity(0)
 		{ *this = x; }
 
 		virtual ~vector (void)
@@ -63,9 +64,9 @@ class vector
 		{
 			if (_capacity)
 				delete[] _value;
-			_size = x.size();
-			_capacity = x.size();
-			_value = new value_type[_size]; //not same capacity !
+			_capacity = 0;
+			reserve(x.size());
+			_size = _capacity;
 			for (size_t i = 0; i < _size; i++)
 				_value[i] = x[i];
 			return (*this);
@@ -151,9 +152,11 @@ class vector
 			if (_capacity < len)
 			{
 				if (_capacity)
+				{
 					delete[] _value;
-				_value = new value_type[len];
-				_capacity = len;
+					_capacity = 0;
+				}
+				reserve(len);
 			}
 			size_t	i = 0;
 			for (InputIterator it = first; it != last; it++)
@@ -168,10 +171,12 @@ class vector
 			if (_capacity < n)
 			{
 				if (_capacity)
+				{
 					delete[] _value;
-				_value = new value_type[n];
+					_capacity = 0;
+				}
+				reserve(n);
 				// _value = reinterpret_cast<value_type*>(operator new(sizeof(value_type) * n));
-				_capacity = n;
 			}
 			for (size_t i = 0; i < n; i++)
 			{
