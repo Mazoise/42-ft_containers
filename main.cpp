@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/21 16:07:04 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/21 16:18:04 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,11 +103,9 @@ void	insert_tests()
 	vector<int> test(1, 1);
 
 	test.insert(test.begin(), 200, 12);
-	std::cout << "s: " << test.size() << ", c: " << test.capacity() << std::endl;
-	test.insert(test.begin() + 12, 200, 30);
-	std::cout << "s: " << test.size() << ", c: " << test.capacity() << std::endl;
-	
 	print_vector<int>(test);
+	// test.insert(test.begin() + 12, 200, 30);
+	// print_vector<int>(test);
 }
 
 void	reserve_tests(void)
@@ -230,7 +228,7 @@ int main()
 	vector<int> test;
 	push_pop_back_tests();
 	resize_tests();
-	// insert_tests();
+	insert_tests();
 	reserve_tests();
 	copy_swap_tests();
 	reverse_it_tests();

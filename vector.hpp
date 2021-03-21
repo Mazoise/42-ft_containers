@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/21 15:55:19 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/21 17:42:41 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ class vector
 			else if (n > _size)
 			{
 				if (n > _capacity)
-					reserve(_size * 2 > n ? _size * 2 : n);
+					reserve(_size << 1 > n ? _size << 1 : n);
 				for (size_t i = _size; i < n; i++)
 					_value[i] = val;
 			}
@@ -187,7 +187,7 @@ class vector
 		void push_back (const value_type& val)
 		{
 			if (_capacity <= _size)
-				reserve(_size == 0 ? 1 : _size * 2);
+				reserve(_size == 0 ? 1 : _size << 1);
 			_value[_size] = val;
 			_size++;
 		}
@@ -200,7 +200,7 @@ class vector
 				if (!_size)
 					reserve(1);
 				else
-					reserve(_size * 2);
+					reserve(_size << 1);
 			}
 			for (iterator it = end(); it != position; it--)
 				*it = *(it - 1);
@@ -210,29 +210,38 @@ class vector
 		}
 		void insert (iterator position, size_type n, const value_type& val)
 		{
+			size_t		diff = position - begin();
+
 			if (_capacity < _size + n)
+			{
 				reserve(_size + n);
-			for (iterator it = end() + n - 1; it != position + n - 1; it--)
+				position = begin() + diff;
+			}
+			_size += n;
+			for (iterator it = end() - 1; it != position + n - 1; it--)
 				*it = *(it - n);
 			for (iterator it = position; it != position + n; it++)
 				*it = val;
-			_size += n;
 		}
 		template <class InputIterator>
 		void insert (iterator position, InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last)
 		{
 			size_t	len = last - first;
-			
+			size_t	diff = position - begin();
+
 			if (_capacity < _size + len)
+			{
 				reserve(_size + len);
-			for (iterator it = end() + len - 1; it != position + len - 1; it--)
+				position = begin() + diff;
+			}
+			_size += len;
+			for (iterator it = end() - 1; it != position + len - 1; it--)
 				*it = *(it - len);
 			for (iterator it = position; it != position + len; it++)
 			{
 				*it = *first;
 				first++;
 			}
-			_size += len;
 		}
 		iterator erase (iterator position)
 		{
@@ -271,35 +280,71 @@ class vector
 			_size = 0;
 		}
 
-		// template <class T, class Alloc>
-		// bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		// {}
-		// template <class T, class Alloc>
-		// bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		// {}
-		// template <class T, class Alloc>
-		// bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		// {}
-		// template <class T, class Alloc>
-		// bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		// {}
-		// template <class T, class Alloc>
-		// bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		// {}
-		// template <class T, class Alloc>
-		// bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-		// {}
-
-		// template <class T, class Alloc>
-		// void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
-		// {}
-
 	private :
 
 		value_type*											_value;
 		size_t												_size;
 		size_t												_capacity;
 };
+
+template <class T, class Alloc>
+bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	if (lhs.size() != rhs.size())
+		return (false);
+	for (size_t i = 0; i < lhs.size(); i++)
+		if (lhs[i] != rhs[i])
+			return(false);
+	return (true);
+}
+template <class T, class Alloc>
+bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	if (lhs == rhs)
+		return (false);
+	return (true);
+}
+template <class T, class Alloc>
+bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	size_t i;
+
+	for (i = 0; i < lhs.size(); i++)
+	{
+		if (i == rhs.size() || rhs[i] < lhs[i])
+			return (false);
+		else if (lhs[i] < rhs[i])
+			return (true);
+	}
+	return (i != rhs.size());
+}
+template <class T, class Alloc>
+bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	if (lhs > rhs)
+		return (false);
+	return (true);
+}
+template <class T, class Alloc>
+bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	if (lhs == rhs || lhs < rhs)
+		return (false);
+	return (true);
+}
+template <class T, class Alloc>
+bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+		if (lhs < rhs)
+		return (false);
+	return (true);
+}
+
+template <class T, class Alloc>
+void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+{
+	x.swap(y);
+}
 
 // template <class Alloc>
 // class vector<bool,Alloc>
