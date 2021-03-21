@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/20 19:12:10 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/21 11:49:04 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,8 @@ class vector
 		{ return (_size == 0);}
 		void reserve (size_type n)
 		{
+			if (n > max_size())
+				throw (std::length_error("vector::reserve"));
 			if (n > _capacity)
 			{
 				value_type*		tmp = new value_type[n];
@@ -146,15 +148,17 @@ class vector
 		void assign (InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last)
 		{
 			size_t	len = last - first;
-			if (_capacity && _capacity < len)
+			if (_capacity < len)
 			{
-				delete[] _value;
+				if (_capacity)
+					delete[] _value;
 				_value = new value_type[len];
+				_capacity = len;
 			}
 			size_t	i = 0;
 			for (InputIterator it = first; it != last; it++)
 			{
-				_value[i] = it;
+				_value[i] = *it;
 				i++;
 			}
 			_size = i;
@@ -187,7 +191,12 @@ class vector
 		iterator insert (iterator position, const value_type& val)
 		{
 			if (_capacity <= _size)
-				reserve(_size == 0 ? 1 : _size * 2);
+			{
+				if (!_size)
+					reserve(1);
+				else
+					reserve(_size * 2);
+			}
 			for (iterator it = end(); it != position; it--)
 				*it = *(it - 1);
 			*position = val;
@@ -202,7 +211,6 @@ class vector
 				*it = *(it - n);
 			for (iterator it = position; it != position + n; it++)
 				*it = val;
-			(void)val;
 			_size += n;
 		}
 		template <class InputIterator>
@@ -212,19 +220,19 @@ class vector
 			
 			if (_capacity < _size + len)
 				reserve(_size + len);
-			for (iterator it = end(); it != position + len - 1; it--)
+			for (iterator it = end() + len - 1; it != position + len - 1; it--)
 				*it = *(it - len);
 			for (iterator it = position; it != position + len; it++)
 			{
-				*it = first;
+				*it = *first;
 				first++;
 			}
 			_size += len;
 		}
 		iterator erase (iterator position)
 		{
-			for (size_t i = position; i < _size - 1; i++)
-				_value[i] = _value[i + 1];
+			for (iterator it = position; it != end() - 1; it++)
+				*it = *it + 1;
 			_size--;
 			return (position);
 		}
@@ -232,7 +240,7 @@ class vector
 		{
 			size_t	len = last - first;
 
-			for (iterator it = first; it != last; it++)
+			for (iterator it = first; it != end() - len; it++)
 				*it = *(it + len);
 			_size -= len;
 			return (first);
