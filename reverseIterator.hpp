@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/19 18:00:17 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/20 11:19:11 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/22 15:28:03 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,15 @@ class reverseIterator
 
 		reverseIterator(void) : _value(0) {}
 		reverseIterator(value_type* value) : _value(value) {}
+		reverseIterator(value_type& value) : _value(&value) {}
 		reverseIterator(const reverseIterator& rhs) : _value(rhs._value) {}
 		virtual ~reverseIterator(void) {}
+
+		operator reverseIterator<const Iterator>()
+		{
+			return reverseIterator<const Iterator>(*_value);
+		}
+
 		reverseIterator&		operator=(value_type* rhs)
 		{
 			_value = rhs;

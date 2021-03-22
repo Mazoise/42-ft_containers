@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/21 17:54:29 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/22 15:34:10 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ class vector
 		: _value(0), _size(0), _capacity(0)
 		{ (void)alloc; } //??
 
-		explicit vector (size_type n, const value_type& val = value_type(),
+		explicit vector (size_type n, const_reference val = value_type(),
 		const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0)
 		{ assign(n, val); (void)alloc; } //??
@@ -58,35 +58,40 @@ class vector
 		{ *this = x; }
 
 		virtual ~vector (void)
-		{ delete[] _value; }
+		{
+			if (_capacity)
+				delete[] _value;
+		}
 
 		vector& operator= (const vector& x)
 		{
 			if (_capacity)
+			{
 				delete[] _value;
-			_capacity = 0;
+				_capacity = 0;
+			}
 			reserve(x.size());
 			_size = _capacity;
-			for (size_t i = 0; i < _size; i++)
+			for (size_type i = 0; i < _size; i++)
 				_value[i] = x[i];
 			return (*this);
 		}
 		iterator begin (void)
-		{ return &_value[0]; }
+		{ return iterator(_value[0]); }
 		const_iterator begin (void) const
-		{ return &_value[0]; }
+		{ return const_iterator(_value[0]); }
 		iterator end (void)
-		{ return &_value[_size]; }
+		{ return iterator(_value[_size]); }
 		const_iterator end (void) const
-		{ return &_value[_size]; }
+		{ return const_iterator(_value[_size]); }
 		reverse_iterator rbegin (void)
-		{ return &_value[_size - 1]; }
+		{ return reverse_iterator(_value[_size - 1]); }
 		const_reverse_iterator rbegin (void) const
-		{ return &_value[_size - 1]; }
+		{ return const_reverse_iterator(_value[_size - 1]); }
 		reverse_iterator rend (void)
-		{ return &_value[-1]; }
+		{ return reverse_iterator(_value[-1]); }
 		const_reverse_iterator rend (void) const
-		{ return &_value[-1]; }
+		{ return const_reverse_iterator(_value[-1]); }
 
 		size_type size (void) const
 		{ return _size; }
@@ -100,7 +105,7 @@ class vector
 			{
 				if (n > _capacity)
 					reserve(_size << 1 > n ? _size << 1 : n);
-				for (size_t i = _size; i < n; i++)
+				for (size_type i = _size; i < n; i++)
 					_value[i] = val;
 			}
 			_size = n;
@@ -115,11 +120,11 @@ class vector
 				throw (std::length_error("vector::reserve"));
 			if (n > _capacity)
 			{
-				value_type*		tmp = new value_type[n];
+				pointer		tmp = new value_type[n];
 
 				if (_capacity)
 				{
-					for (size_t i = 0; i < _size; i++)
+					for (size_type i = 0; i < _size; i++)
 						tmp[i] = _value[i];
 					delete[] _value;
 				}
@@ -127,15 +132,24 @@ class vector
 				_capacity = n;
 			}
 		}
-
 		reference operator[] (size_type n)
-		{ return _value[n]; }
+		{ return at(n); }
 		const_reference operator[] (size_type n) const
-		{ return _value[n]; }
+		{ return at(n); }
 		reference at (size_type n)
-		{ return _value[n]; }
+		{
+			if (n > _size)
+				throw std::out_of_range("");
+			else
+				return _value[n];
+		}
 		const_reference at (size_type n) const
-		{ return _value[n]; }
+		{
+			if (n > _size)
+				throw std::out_of_range("");
+			else
+				return _value[n];
+		}
 		reference front (void)
 		{ return _value[0]; }
 		const_reference front (void) const
@@ -148,7 +162,7 @@ class vector
 		template <class InputIterator>
 		void assign (InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last)
 		{
-			size_t	len = last - first;
+			size_type	len = last - first;
 			if (_capacity < len)
 			{
 				if (_capacity)
@@ -158,7 +172,7 @@ class vector
 				}
 				reserve(len);
 			}
-			size_t	i = 0;
+			size_type	i = 0;
 			for (InputIterator it = first; it != last; it++)
 			{
 				_value[i] = *it;
@@ -166,7 +180,7 @@ class vector
 			}
 			_size = i;
 		}
-		void assign (size_type n, const value_type& val)
+		void assign (size_type n, const_reference val)
 		{
 			if (_capacity < n)
 			{
@@ -176,15 +190,15 @@ class vector
 					_capacity = 0;
 				}
 				reserve(n);
-				// _value = reinterpret_cast<value_type*>(operator new(sizeof(value_type) * n));
+				// _value = reinterpret_cast<pointer>(operator new(sizeof(value_type) * n));
 			}
-			for (size_t i = 0; i < n; i++)
+			for (size_type i = 0; i < n; i++)
 			{
 				_value[i] = val;
 			}
 			_size = n;
 		}
-		void push_back (const value_type& val)
+		void push_back (const_reference val)
 		{
 			if (_capacity <= _size)
 				reserve(_size == 0 ? 1 : _size << 1);
@@ -193,7 +207,7 @@ class vector
 		}
 		void pop_back (void)
 		{ erase(end() - 1); }
-		iterator insert (iterator position, const value_type& val)
+		iterator insert (iterator position, const_reference val)
 		{
 			if (_capacity <= _size)
 			{
@@ -208,9 +222,9 @@ class vector
 			_size++;
 			return (position);
 		}
-		void insert (iterator position, size_type n, const value_type& val)
+		void insert (iterator position, size_type n, const_reference val)
 		{
-			size_t		diff = position - begin();
+			size_type		diff = position - begin();
 
 			if (_capacity < _size + n)
 			{
@@ -226,8 +240,8 @@ class vector
 		template <class InputIterator>
 		void insert (iterator position, InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last)
 		{
-			size_t	len = last - first;
-			size_t	diff = position - begin();
+			size_type	len = last - first;
+			size_type	diff = position - begin();
 
 			if (_capacity < _size + len)
 			{
@@ -252,7 +266,7 @@ class vector
 		}
 		iterator erase (iterator first, iterator last)
 		{
-			size_t	len = last - first;
+			size_type	len = last - first;
 
 			for (iterator it = first; it != end() - len; it++)
 				*it = *(it + len);
@@ -261,8 +275,8 @@ class vector
 		}
 		void swap (vector& x) //swap with other vector !
 		{
-			value_type*		tmp_value;
-			size_t			tmp;
+			pointer			tmp_value;
+			size_type			tmp;
 
 			tmp = _capacity;
 			_capacity = x._capacity;
@@ -282,9 +296,9 @@ class vector
 
 	private :
 
-		value_type*											_value;
-		size_t												_size;
-		size_t												_capacity;
+		pointer											_value;
+		size_type												_size;
+		size_type												_capacity;
 };
 
 template <class T, class Alloc>
@@ -292,7 +306,7 @@ bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
 	if (lhs.size() != rhs.size())
 		return (false);
-	for (size_t i = 0; i < lhs.size(); i++)
+	for (typename vector<T, Alloc>::size_type	i = 0; i < lhs.size(); i++)
 		if (lhs[i] != rhs[i])
 			return(false);
 	return (true);
@@ -307,7 +321,7 @@ bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 template <class T, class Alloc>
 bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
-	size_t i;
+	typename vector<T, Alloc>::size_type		i;
 
 	for (i = 0; i < lhs.size(); i++)
 	{
@@ -357,7 +371,7 @@ void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
 // 			~reference (void);
 // 			operator bool (void) const;                               // convert to bool
 // 			reference& operator= (const bool x);                  // assign from bool
-// 			reference& operator= (const reference& x);            // assign from bit
+// 			reference& operator= (const_reference& x);            // assign from bit
 // 			void flip (void);                                          // flip bit value.
 // 	};
 // 	void			flip (void);

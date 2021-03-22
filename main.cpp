@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/21 16:18:04 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/03/22 14:55:13 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,7 +225,6 @@ void	awesome_tests(void)
 
 int main()
 {
-	vector<int> test;
 	push_pop_back_tests();
 	resize_tests();
 	insert_tests();
