@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/19 18:00:17 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/22 15:28:03 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/04/13 19:15:07 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,13 @@ class reverseIterator
 		bool						operator!=(const reverseIterator& rhs) const
 		{ return (_value != rhs._value); }
 		bool						operator<(const reverseIterator& rhs) const
-		{ return (_value < rhs._value); }
-		bool						operator>(const reverseIterator& rhs) const
 		{ return (_value > rhs._value); }
+		bool						operator>(const reverseIterator& rhs) const
+		{ return (_value < rhs._value); }
 		bool						operator<=(const reverseIterator& rhs) const
-		{ return (_value <= rhs._value); }
-		bool						operator>=(const reverseIterator& rhs) const
 		{ return (_value >= rhs._value); }
+		bool						operator>=(const reverseIterator& rhs) const
+		{ return (_value <= rhs._value); }
 
 		value_type&					operator*(void) const
 		{ return *_value; }
@@ -78,13 +78,11 @@ class reverseIterator
 			_value += rhs;
 			return (*this);
 		}
-		reverseIterator		operator+(const reverseIterator& rhs)
-		{ return (_value + rhs._value); }
 		reverseIterator		operator+(difference_type rhs) const
 		{ return (reverseIterator(_value - rhs)); }
 
-		difference_type				operator-(const reverseIterator& rhs) const
-		{ return (_value - rhs._value); }
+		difference_type		operator-(const reverseIterator& rhs) const
+		{ return (rhs._value - _value); }
 		reverseIterator		operator-(difference_type rhs) const
 		{ return (reverseIterator(_value + rhs)); }
 

@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/22 14:55:13 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/04/13 19:50:39 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,11 +101,24 @@ void	insert_tests()
 {
 	std::cout << std::endl << "INSERT TESTS" << std::endl;
 	vector<int> test(1, 1);
+	vector<int> test2(5, 5);
 
 	test.insert(test.begin(), 200, 12);
 	print_vector<int>(test);
-	// test.insert(test.begin() + 12, 200, 30);
-	// print_vector<int>(test);
+	test.insert(test.begin() + 12, 200, 30);
+	print_vector<int>(test);
+	test.insert(test.end(), 12, 50);
+	print_vector<int>(test);
+	test.insert(test.end() - 1, 0, 60);
+	print_vector<int>(test);
+	test.insert(test.end() - 1, 1, 70);
+	print_vector<int>(test);
+	test.insert(test.begin() + 412, test2.begin(), test2.end());
+	print_vector<int>(test);
+	test.insert(test.begin(), test2.begin(), test2.end());
+	print_vector<int>(test);
+	test.insert(test.end(), test2.begin(), test2.end());
+	print_vector<int>(test);
 }
 
 void	reserve_tests(void)
@@ -174,7 +187,10 @@ void	reverse_it_tests(void)
 	std::cout << *(test.rbegin() + 2) << std::endl;
 	std::cout << *(test.rend() - 8) << std::endl;
 	std::cout << (test.rbegin() == revbeg) << std::endl;
+	revbeg++;
+	std::cout << *revbeg << std::endl;
 	std::cout << (test.rbegin() == test.rend()) << std::endl;
+	std::cout << (test.rbegin() <= test.rbegin()) << std::endl;
 	std::cout << (test.rbegin() < test.rend()) << std::endl;
 	std::cout << (test.rbegin() >= test.rend()) << std::endl;
 	revbeg += 3;
@@ -232,6 +248,6 @@ int main()
 	copy_swap_tests();
 	reverse_it_tests();
 	erase_clear_tests();
-	awesome_tests();
+	// awesome_tests();
 	max_size_tests();
 }

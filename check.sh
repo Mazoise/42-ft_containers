@@ -2,7 +2,7 @@
 
 make
 cp main.cpp tests.cpp
-sed -i -e "s/ft::/std::/g" tests.cpp
+sed -i -e "s/using namespace ft/using namespace std/g" tests.cpp
 clang++ -Wall -Wextra -Werror -std=c++98 tests.cpp -o test_containers
 ./ft_containers > my_res
 ./test_containers > test_res

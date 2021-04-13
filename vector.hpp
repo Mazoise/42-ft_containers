@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/22 15:34:10 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/04/13 19:57:42 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "randomAccessIterator.hpp"
 #include "reverseIterator.hpp"
 #include "enableIf.hpp"
+#include <limits>
 
 namespace ft
 {
@@ -96,7 +97,7 @@ class vector
 		size_type size (void) const
 		{ return _size; }
 		size_type max_size (void) const
-		{ return (4611686018427387903); } // ?
+		{ return std::numeric_limits<size_type>::max() / (sizeof(*_value)); }
 		void resize (size_type n, value_type val = value_type())
 		{
 			if (n < _size)
@@ -209,12 +210,15 @@ class vector
 		{ erase(end() - 1); }
 		iterator insert (iterator position, const_reference val)
 		{
+			size_type		diff = position - begin();
+	
 			if (_capacity <= _size)
 			{
 				if (!_size)
 					reserve(1);
 				else
 					reserve(_size << 1);
+				position = begin() + diff;
 			}
 			for (iterator it = end(); it != position; it--)
 				*it = *(it - 1);
@@ -228,7 +232,10 @@ class vector
 
 			if (_capacity < _size + n)
 			{
-				reserve(_size + n);
+				if (_size * 2 < _size + n)
+					reserve(_size + n);
+				else
+					reserve(_size * 2);
 				position = begin() + diff;
 			}
 			_size += n;
@@ -245,7 +252,10 @@ class vector
 
 			if (_capacity < _size + len)
 			{
-				reserve(_size + len);
+				if (_size * 2 < _size + len)
+					reserve(_size + len);
+				else
+					reserve(_size * 2);
 				position = begin() + diff;
 			}
 			_size += len;

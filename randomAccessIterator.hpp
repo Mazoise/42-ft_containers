@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/22 15:29:55 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/04/13 19:08:03 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,8 +78,7 @@ class randomAccessIterator // : public std::iterator<std::random_access_iterator
 			_value -= rhs;
 			return (*this);
 		}
-		randomAccessIterator		operator+(const randomAccessIterator& rhs)
-		{ return (_value + rhs._value); }
+
 		randomAccessIterator		operator+(difference_type rhs) const
 		{ return (randomAccessIterator(_value + rhs)); }
 
