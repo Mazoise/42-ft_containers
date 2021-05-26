@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   vector.hpp                                         :+:      :+:    :+:   */
+/*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/05/26 17:21:59 by mchardin         ###   ########.fr       */
+/*   Created: 2021/03/03 19:00:54 by mchardin          #+#    #+#             */
+/*   Updated: 2021/05/26 18:50:45 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef VECTOR_HPP
-# define VECTOR_HPP
+#ifndef LIST_HPP
+# define LIST_HPP
 
-#include "randomAccessIterator.hpp"
+#include "bidirIterator.hpp"
 #include "reverseIterator.hpp"
 #include "enableIf.hpp"
 #include <limits>
@@ -22,7 +22,7 @@ namespace ft
 {
 
 template < class T, class Alloc = std::allocator<T> >
-class vector
+class list
 {
 	public :
 
@@ -34,37 +34,37 @@ class vector
 		typedef const value_type&									const_reference;
 		typedef value_type*											pointer;
 		typedef const value_type*									const_pointer;
-		typedef typename ft::randomAccessIterator<value_type>		iterator;
-		typedef typename ft::randomAccessIterator<const value_type>	const_iterator;
+		typedef typename ft::bidirIterator<value_type>				iterator;
+		typedef typename ft::bidirIterator<const value_type>		const_iterator;
 		typedef ft::reverseIterator<iterator>						reverse_iterator;
 		typedef ft::reverseIterator<const_iterator>					const_reverse_iterator;
 
-		explicit vector (const allocator_type& alloc = allocator_type())
+		explicit list (const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0)
 		{ (void)alloc; } //??
 
-		explicit vector (size_type n, const_reference val = value_type(),
+		explicit list (size_type n, const_reference val = value_type(),
 		const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0)
 		{ assign(n, val); (void)alloc; } //??
 
 		template <class InputIterator>
-		vector (InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last,
+		list (InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last,
 		const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0)
 		{ assign(first, last); (void)alloc; }
 
-		vector (const vector& x)
+		list (const list& x)
 		: _value(0), _size(0), _capacity(0)
 		{ *this = x; }
 
-		virtual ~vector (void)
+		virtual ~list (void)
 		{
 			if (_capacity)
 				delete[] _value;
 		}
 
-		vector& operator= (const vector& x)
+		list& operator= (const list& x)
 		{
 			if (_capacity)
 			{
@@ -118,7 +118,7 @@ class vector
 		void reserve (size_type n)
 		{
 			if (n > max_size())
-				throw (std::length_error("vector::reserve"));
+				throw (std::length_error("list::reserve"));
 			if (n > _capacity)
 			{
 				pointer		tmp = new value_type[n];
@@ -283,7 +283,7 @@ class vector
 			_size -= len;
 			return (first);
 		}
-		void swap (vector& x) //swap with other vector !
+		void swap (list& x) //swap with other list !
 		{
 			pointer			tmp_value;
 			size_type			tmp;
@@ -312,26 +312,26 @@ class vector
 };
 
 template <class T, class Alloc>
-bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator== (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
 {
 	if (lhs.size() != rhs.size())
 		return (false);
-	for (typename vector<T, Alloc>::size_type	i = 0; i < lhs.size(); i++)
+	for (typename list<T, Alloc>::size_type	i = 0; i < lhs.size(); i++)
 		if (lhs[i] != rhs[i])
 			return(false);
 	return (true);
 }
 template <class T, class Alloc>
-bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator!= (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
 {
 	if (lhs == rhs)
 		return (false);
 	return (true);
 }
 template <class T, class Alloc>
-bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator< (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
 {
-	typename vector<T, Alloc>::size_type		i;
+	typename list<T, Alloc>::size_type		i;
 
 	for (i = 0; i < lhs.size(); i++)
 	{
@@ -343,21 +343,21 @@ bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	return (i != rhs.size());
 }
 template <class T, class Alloc>
-bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator<= (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
 {
 	if (lhs > rhs)
 		return (false);
 	return (true);
 }
 template <class T, class Alloc>
-bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator>  (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
 {
 	if (lhs == rhs || lhs < rhs)
 		return (false);
 	return (true);
 }
 template <class T, class Alloc>
-bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator>= (const list<T,Alloc>& lhs, const list<T,Alloc>& rhs)
 {
 		if (lhs < rhs)
 		return (false);
@@ -365,7 +365,7 @@ bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 }
 
 template <class T, class Alloc>
-void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+void swap (list<T,Alloc>& x, list<T,Alloc>& y)
 {
 	x.swap(y);
 }

@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/04/13 19:50:39 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/05/24 15:58:07 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,6 +248,6 @@ int main()
 	copy_swap_tests();
 	reverse_it_tests();
 	erase_clear_tests();
-	// awesome_tests();
+	awesome_tests();
 	max_size_tests();
 }
