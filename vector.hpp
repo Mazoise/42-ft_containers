@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/05/26 17:21:59 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/21 17:44:32 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,19 +40,19 @@ class vector
 		typedef ft::reverseIterator<const_iterator>					const_reverse_iterator;
 
 		explicit vector (const allocator_type& alloc = allocator_type())
-		: _value(0), _size(0), _capacity(0)
-		{ (void)alloc; } //??
+		: _value(0), _size(0), _capacity(0), _alloc(alloc)
+		{}
 
 		explicit vector (size_type n, const_reference val = value_type(),
 		const allocator_type& alloc = allocator_type())
-		: _value(0), _size(0), _capacity(0)
-		{ assign(n, val); (void)alloc; } //??
+		: _value(0), _size(0), _capacity(0), _alloc(alloc)
+		{ assign(n, val); }
 
 		template <class InputIterator>
 		vector (InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last,
 		const allocator_type& alloc = allocator_type())
-		: _value(0), _size(0), _capacity(0)
-		{ assign(first, last); (void)alloc; }
+		: _value(0), _size(0), _capacity(0), _alloc(alloc)
+		{ assign(first, last); }
 
 		vector (const vector& x)
 		: _value(0), _size(0), _capacity(0)
@@ -61,14 +61,21 @@ class vector
 		virtual ~vector (void)
 		{
 			if (_capacity)
-				delete[] _value;
+			{
+				for (size_type i = 0; i < _size; i++)
+					_alloc.destroy(&_value[i]);
+				_alloc.deallocate(_value, _capacity);
+			}
 		}
 
 		vector& operator= (const vector& x)
 		{
+			_alloc = x._alloc;
 			if (_capacity)
 			{
-				delete[] _value;
+				for (size_type i = 0; i < _size; i++)
+					_alloc.destroy(&_value[i]);
+				_alloc.deallocate(_value, _capacity);
 				_capacity = 0;
 			}
 			reserve(x.size());
@@ -97,7 +104,7 @@ class vector
 		size_type size (void) const
 		{ return _size; }
 		size_type max_size (void) const
-		{ return std::numeric_limits<size_type>::max() / (sizeof(*_value)); }
+		{ return _alloc.max_size(); }
 		void resize (size_type n, value_type val = value_type())
 		{
 			if (n < _size)
@@ -117,17 +124,19 @@ class vector
 		{ return (_size == 0);}
 		void reserve (size_type n)
 		{
-			if (n > max_size())
+			if (n > _alloc.max_size())
 				throw (std::length_error("vector::reserve"));
 			if (n > _capacity)
 			{
-				pointer		tmp = new value_type[n];
+				pointer		tmp = _alloc.allocate(n);
 
 				if (_capacity)
 				{
 					for (size_type i = 0; i < _size; i++)
+					{
 						tmp[i] = _value[i];
-					delete[] _value;
+					}
+					_alloc.deallocate(_value, _capacity);
 				}
 				_value = tmp;
 				_capacity = n;
@@ -168,7 +177,9 @@ class vector
 			{
 				if (_capacity)
 				{
-					delete[] _value;
+					for (size_type i = 0; i < _size; i++)
+						_alloc.destroy(&_value[i]);
+					_alloc.deallocate(_value, _capacity);
 					_capacity = 0;
 				}
 				reserve(len);
@@ -187,7 +198,9 @@ class vector
 			{
 				if (_capacity)
 				{
-					delete[] _value;
+					for (size_type i = 0; i < _size; i++)
+						_alloc.destroy(&_value[i]);
+					_alloc.deallocate(_value, _capacity);
 					_capacity = 0;
 				}
 				reserve(n);
@@ -299,7 +312,7 @@ class vector
 			x._value = tmp_value;
 		}
 
-		void clear (void) //destroy?
+		void clear (void) //_alloc.destroy?
 		{
 			_size = 0;
 		}
@@ -309,60 +322,8 @@ class vector
 		pointer											_value;
 		size_type												_size;
 		size_type												_capacity;
+		allocator_type											_alloc;
 };
-
-template <class T, class Alloc>
-bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-{
-	if (lhs.size() != rhs.size())
-		return (false);
-	for (typename vector<T, Alloc>::size_type	i = 0; i < lhs.size(); i++)
-		if (lhs[i] != rhs[i])
-			return(false);
-	return (true);
-}
-template <class T, class Alloc>
-bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-{
-	if (lhs == rhs)
-		return (false);
-	return (true);
-}
-template <class T, class Alloc>
-bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-{
-	typename vector<T, Alloc>::size_type		i;
-
-	for (i = 0; i < lhs.size(); i++)
-	{
-		if (i == rhs.size() || rhs[i] < lhs[i])
-			return (false);
-		else if (lhs[i] < rhs[i])
-			return (true);
-	}
-	return (i != rhs.size());
-}
-template <class T, class Alloc>
-bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-{
-	if (lhs > rhs)
-		return (false);
-	return (true);
-}
-template <class T, class Alloc>
-bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-{
-	if (lhs == rhs || lhs < rhs)
-		return (false);
-	return (true);
-}
-template <class T, class Alloc>
-bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-{
-		if (lhs < rhs)
-		return (false);
-	return (true);
-}
 
 template <class T, class Alloc>
 void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
