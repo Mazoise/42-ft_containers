@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/21 17:44:32 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/22 12:22:50 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,22 +40,22 @@ class vector
 		typedef ft::reverseIterator<const_iterator>					const_reverse_iterator;
 
 		explicit vector (const allocator_type& alloc = allocator_type())
-		: _value(0), _size(0), _capacity(0), _alloc(alloc)
+		: _value(0), _size(0), _capacity(0), _alloc(alloc), _old_capacity(0)
 		{}
 
 		explicit vector (size_type n, const_reference val = value_type(),
 		const allocator_type& alloc = allocator_type())
-		: _value(0), _size(0), _capacity(0), _alloc(alloc)
+		: _value(0), _size(0), _capacity(0), _alloc(alloc), _old_capacity(0)
 		{ assign(n, val); }
 
 		template <class InputIterator>
 		vector (InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last,
 		const allocator_type& alloc = allocator_type())
-		: _value(0), _size(0), _capacity(0), _alloc(alloc)
+		: _value(0), _size(0), _capacity(0), _alloc(alloc), _old_capacity(0)
 		{ assign(first, last); }
 
 		vector (const vector& x)
-		: _value(0), _size(0), _capacity(0)
+		: _value(0), _size(0), _capacity(0), _old_capacity(0)
 		{ *this = x; }
 
 		virtual ~vector (void)
@@ -73,15 +73,14 @@ class vector
 			_alloc = x._alloc;
 			if (_capacity)
 			{
-				for (size_type i = 0; i < _size; i++)
-					_alloc.destroy(&_value[i]);
-				_alloc.deallocate(_value, _capacity);
+				save_old();
 				_capacity = 0;
 			}
 			reserve(x.size());
 			_size = _capacity;
 			for (size_type i = 0; i < _size; i++)
-				_value[i] = x[i];
+				_alloc.construct(&_value[i], x[i]);
+			destroy_dealloc_old();
 			return (*this);
 		}
 		iterator begin (void)
@@ -134,7 +133,11 @@ class vector
 				{
 					for (size_type i = 0; i < _size; i++)
 					{
-						tmp[i] = _value[i];
+						_alloc.construct(&tmp[i], _value[i]);
+					}
+					for (size_type i = 0; i < _size; i++)
+					{
+						_alloc.destroy(&_value[i]);
 					}
 					_alloc.deallocate(_value, _capacity);
 				}
@@ -177,9 +180,7 @@ class vector
 			{
 				if (_capacity)
 				{
-					for (size_type i = 0; i < _size; i++)
-						_alloc.destroy(&_value[i]);
-					_alloc.deallocate(_value, _capacity);
+					save_old();
 					_capacity = 0;
 				}
 				reserve(len);
@@ -187,10 +188,11 @@ class vector
 			size_type	i = 0;
 			for (InputIterator it = first; it != last; it++)
 			{
-				_value[i] = *it;
+				_alloc.construct(&_value[i], *it);
 				i++;
 			}
 			_size = i;
+			destroy_dealloc_old();
 		}
 		void assign (size_type n, const_reference val)
 		{
@@ -208,16 +210,18 @@ class vector
 			}
 			for (size_type i = 0; i < n; i++)
 			{
-				_value[i] = val;
+				_alloc.construct(&_value[i], val);
 			}
 			_size = n;
 		}
 		void push_back (const_reference val)
 		{
+			// insert(_value.end(), val); // ??
 			if (_capacity <= _size)
-				reserve(_size == 0 ? 1 : _size << 1);
-			_value[_size] = val;
+				reserve_no_destroy(_size == 0 ? 1 : _size << 1);
+			_alloc.construct(&_value[_size], val);
 			_size++;
+			destroy_dealloc_old();
 		}
 		void pop_back (void)
 		{ erase(end() - 1); }
@@ -228,15 +232,16 @@ class vector
 			if (_capacity <= _size)
 			{
 				if (!_size)
-					reserve(1);
+					reserve_no_destroy(1);
 				else
-					reserve(_size << 1);
+					reserve_no_destroy(_size << 1);
 				position = begin() + diff;
 			}
 			for (iterator it = end(); it != position; it--)
 				*it = *(it - 1);
-			*position = val;
+			_alloc.construct(position, val);
 			_size++;
+			destroy_dealloc_old();
 			return (position);
 		}
 		void insert (iterator position, size_type n, const_reference val)
@@ -246,16 +251,17 @@ class vector
 			if (_capacity < _size + n)
 			{
 				if (_size * 2 < _size + n)
-					reserve(_size + n);
+					reserve_no_destroy(_size + n);
 				else
-					reserve(_size * 2);
+					reserve_no_destroy(_size * 2);
 				position = begin() + diff;
 			}
 			_size += n;
 			for (iterator it = end() - 1; it != position + n - 1; it--)
 				*it = *(it - n);
 			for (iterator it = position; it != position + n; it++)
-				*it = val;
+				_alloc.construct(&(*it), val);
+			destroy_dealloc_old();
 		}
 		template <class InputIterator>
 		void insert (iterator position, InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last)
@@ -266,9 +272,9 @@ class vector
 			if (_capacity < _size + len)
 			{
 				if (_size * 2 < _size + len)
-					reserve(_size + len);
+					reserve_no_destroy(_size + len);
 				else
-					reserve(_size * 2);
+					reserve_no_destroy(_size * 2);
 				position = begin() + diff;
 			}
 			_size += len;
@@ -276,9 +282,10 @@ class vector
 				*it = *(it - len);
 			for (iterator it = position; it != position + len; it++)
 			{
-				*it = *first;
+				_alloc.construct(&(*it), *first);
 				first++;
 			}
+			destroy_dealloc_old();
 		}
 		iterator erase (iterator position)
 		{
@@ -319,10 +326,51 @@ class vector
 
 	private :
 
-		pointer											_value;
+		pointer													_value;
 		size_type												_size;
 		size_type												_capacity;
 		allocator_type											_alloc;
+		pointer													_old_value;
+		size_type												_old_size;
+		size_type												_old_capacity;
+
+		void	reserve_no_destroy(size_type n)
+		{
+			if (n > _alloc.max_size())
+				throw (std::length_error("vector::reserve"));
+			if (n > _capacity)
+			{
+				save_old();
+				_value = _alloc.allocate(n);
+
+				if (_capacity)
+				{
+					for (size_type i = 0; i < _size; i++)
+					{
+						_alloc.construct(&_value[i], _old_value[i]);
+					}
+				}
+				_capacity = n;
+			}
+		}
+		void	save_old(void)
+		{
+			_old_value = _value;
+			_old_capacity = _capacity;
+			_old_size = _size;
+		}
+		void	destroy_dealloc_old(void)
+		{
+			if (_old_capacity)
+			{
+				for (size_type i = 0; i < _old_size; i++)
+				{
+					_alloc.destroy(&_old_value[i]);
+				}
+				_alloc.deallocate(_old_value, _old_capacity);
+				_old_capacity = 0;
+			}
+		}
 };
 
 template <class T, class Alloc>

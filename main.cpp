@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/05/24 15:58:07 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/22 12:23:30 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,10 @@ class Awesome {
 
 	public:
 
-		Awesome( void ) : _n( 42 ) { std::cout << "Hello default !" << std::endl; }
-		Awesome( int n ) : _n( 42 ) { std::cout << "Hello number !" << std::endl; (void)n; }
-		Awesome( Awesome const &rhs ) : _n( 42 ) { *this = rhs; std::cout << "Hello copy !" << std::endl; }
-		virtual ~Awesome(void) { std::cout << "Goodbye !" << std::endl; }
+		Awesome( void ) : _n( 42 ) { std::cout << "Default constructor" << std::endl; }
+		Awesome( int n ) : _n( n ) { std::cout << "Int constructor" << std::endl; (void)n; }
+		Awesome( Awesome const &rhs ) : _n( 42 ) { *this = rhs; std::cout << "Copy constructor" << std::endl; }
+		virtual ~Awesome(void) { std::cout << "Destructor" << std::endl; }
 
 		Awesome &operator=( Awesome const & rhs ) { this->_n = rhs._n; return (*this); }
 		bool operator==( Awesome const & rhs ) const { return (this->_n == rhs._n); }
@@ -236,6 +236,10 @@ void	awesome_tests(void)
 	test2.push_back(8);
 	test2.push_back(16);
 	print_vector<Awesome>(test2);
+	test.insert(test.end(), test2.begin(), test2.end());
+	// test.insert(test.begin(), test2.begin(), test2.end());
+	print_vector<Awesome>(test);
+	test2 = test;
 	std::cout << "end awesome test" << std::endl;
 }
 
