@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/22 12:23:30 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/22 14:39:31 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,10 +236,15 @@ void	awesome_tests(void)
 	test2.push_back(8);
 	test2.push_back(16);
 	print_vector<Awesome>(test2);
-	test.insert(test.end(), test2.begin(), test2.end());
-	// test.insert(test.begin(), test2.begin(), test2.end());
+	test.assign(test2.begin(), test2.end());
 	print_vector<Awesome>(test);
+	test = test2;
+	print_vector<Awesome>(test);
+	test.insert(test.end(), test2.begin(), test2.end());
+	print_vector<Awesome>(test);
+	// test.insert(test.begin(), test2.begin(), test2.end());
 	test2 = test;
+	print_vector<Awesome>(test);
 	std::cout << "end awesome test" << std::endl;
 }
 
