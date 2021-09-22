@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/22 14:48:03 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/22 16:00:47 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,17 +98,11 @@ class vector
 		void resize (size_type n, value_type val = value_type())
 		{
 			if (n < _size)
-			{
-				_size = n;
 				for (size_t	i = n; i < _size; i++)
 					_alloc.destroy(&_value[i]);
-			}
 			else if (n > _size)
 			{
-				if (n > _capacity)
-					reserve(_size << 1 > n ? _size << 1 : n); // reserve no destroy?
-				for (size_type i = _size; i < n; i++)
-					_alloc.construct(&_value[i], val);
+				insert(end(), n - _size, val);
 			}
 			_size = n;
 		}
@@ -231,8 +225,13 @@ class vector
 		}
 		iterator erase (iterator position)
 		{
+			_alloc.destroy(&(*position));
 			for (iterator it = position; it != end() - 1; it++)
+			{
 				*it = *(it + 1);
+			}
+			if (position == end() - 1)
+				_alloc.destroy(&(*position));
 			_size--;
 			return (position);
 		}
@@ -240,6 +239,8 @@ class vector
 		{
 			size_type	len = last - first;
 
+			for (iterator it = first; it != last; it++)
+				_alloc.destroy(&(*it));
 			for (iterator it = first; it != end() - len; it++)
 				*it = *(it + len);
 			_size -= len;
@@ -263,7 +264,7 @@ class vector
 
 		void clear (void) //_alloc.destroy?
 		{
-			_size = 0;
+			erase(begin(), end());
 		}
 
 	private :
