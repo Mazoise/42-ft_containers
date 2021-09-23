@@ -6,15 +6,14 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/22 16:00:47 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/23 14:40:28 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 
-#include "randomAccessIterator.hpp"
-#include "reverseIterator.hpp"
+#include "vector_iterator.hpp"
 #include "enableIf.hpp"
 #include <limits>
 
@@ -34,10 +33,10 @@ class vector
 		typedef const value_type&									const_reference;
 		typedef value_type*											pointer;
 		typedef const value_type*									const_pointer;
-		typedef typename ft::randomAccessIterator<value_type>		iterator;
-		typedef typename ft::randomAccessIterator<const value_type>	const_iterator;
-		typedef ft::reverseIterator<iterator>						reverse_iterator;
-		typedef ft::reverseIterator<const_iterator>					const_reverse_iterator;
+		typedef vector_iterator<value_type>							iterator;
+		typedef vector_iterator<const value_type>					const_iterator;
+		typedef rev_vector_iterator<iterator>						reverse_iterator;
+		typedef rev_vector_iterator<const_iterator>					const_reverse_iterator;
 
 		explicit vector (const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0), _alloc(alloc), _old_capacity(0)
@@ -340,6 +339,64 @@ template <class T, class Alloc>
 void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
 {
 	x.swap(y);
+}
+
+template <class T, class Alloc>
+bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	if (lhs.size() != rhs.size())
+		return (false);
+	for (typename vector<T, Alloc>::size_type	i = 0; i < lhs.size(); i++)
+		if (lhs[i] != rhs[i])
+			return(false);
+	return (true);
+}
+
+template <class T, class Alloc>
+bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	if (lhs == rhs)
+		return (false);
+	return (true);
+}
+
+template <class T, class Alloc>
+bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	typename vector<T, Alloc>::size_type		i;
+
+	for (i = 0; i < lhs.size(); i++)
+	{
+		if (i == rhs.size() || rhs[i] < lhs[i])
+			return (false);
+		else if (lhs[i] < rhs[i])
+			return (true);
+	}
+	return (i != rhs.size());
+}
+
+template <class T, class Alloc>
+bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	if (lhs > rhs)
+		return (false);
+	return (true);
+}
+
+template <class T, class Alloc>
+bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	if (lhs == rhs || lhs < rhs)
+		return (false);
+	return (true);
+}
+
+template <class T, class Alloc>
+bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+		if (lhs < rhs)
+		return (false);
+	return (true);
 }
 
 }

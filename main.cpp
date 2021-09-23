@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/22 16:02:12 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/23 14:25:00 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,10 +244,12 @@ void	awesome_tests(void)
 	test2.push_back(8);
 	test2.push_back(16);
 	print_vector<Awesome>(test2);
+	std::cout << "SAME ?" << (test.begin() + 1 == test2.begin() + 1) << std::endl;
 	test.assign(test2.begin(), test2.end());
 	print_vector<Awesome>(test);
 	test = test2;
 	print_vector<Awesome>(test);
+	std::cout << "SAME ?" << (test.begin() + 1 == test2.begin() + 1) << std::endl;
 	test.insert(test.end(), test2.begin(), test2.end());
 	print_vector<Awesome>(test);
 	// test.insert(test.begin(), test2.begin(), test2.end());
@@ -273,5 +275,5 @@ int main()
 	copy_swap_tests<Awesome>();
 	reverse_it_tests<Awesome>();
 	erase_clear_tests<Awesome>();
-	// awesome_tests();
+	awesome_tests();
 }

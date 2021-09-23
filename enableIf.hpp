@@ -6,9 +6,12 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/09 11:28:30 by mchardin          #+#    #+#             */
-/*   Updated: 2021/03/20 19:10:43 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/23 14:22:44 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#ifndef ENABLE_IF_HPP
+# define ENABLE_IF_HPP
 
 namespace ft
 {
@@ -44,3 +47,5 @@ template<class T>
 struct enable_if <true, T> { typedef T type; };
 
 }
+
+#endif

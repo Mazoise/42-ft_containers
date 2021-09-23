@@ -1,0 +1,6 @@
+FT_CONTAINERS_TESTER
+**.o
+**.a
+test_res
+my_res
+diff
