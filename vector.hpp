@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/23 14:40:28 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/23 17:39:08 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -317,8 +317,12 @@ class vector
 		iterator	prepare_insert(iterator position, size_type n)
 		{
 			size_type		diff = position - begin();
+			size_type		old_capacity;
+
 			if (_capacity < _size + n)
 			{
+				old_capacity = _capacity;
+				_capacity = 0;
 				if (n == 1 && !_size)
 					reserve_no_destroy(1);
 				else if (_size << 1 < _size + n)
@@ -326,11 +330,33 @@ class vector
 				else
 					reserve_no_destroy(_size << 1);
 				position = begin() + diff;
+				_old_capacity = old_capacity;
+				_size += n;
+				if (_size - n)
+				{
+					size_type	old_i = _old_size - 1;
+					for (size_type i = _size - 1; i > diff + n - 1; i--)
+					{
+						_alloc.construct(&_value[i], _old_value[old_i]);
+						old_i--;
+					}
+					old_i = 0;
+					for (size_type i = 0; i  < diff; i++)
+					{
+						_alloc.construct(&_value[i], _old_value[old_i]);			
+						old_i++;
+					}
+				}				
 			}
-			_size += n;
-			if (_size)
-				for (iterator it = end() - 1; it != position + n - 1; it--)
-					*it = *(it - n);
+			else
+			{
+				_size += n;
+				if (_size - n)
+				{
+					for (iterator it = end() - 1; it != position + n - 1; it--)
+						*it = *(it - n);
+				}
+			}
 			return (position);
 		}
 };

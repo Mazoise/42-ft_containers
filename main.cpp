@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/23 14:25:00 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/23 17:34:12 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -252,7 +252,7 @@ void	awesome_tests(void)
 	std::cout << "SAME ?" << (test.begin() + 1 == test2.begin() + 1) << std::endl;
 	test.insert(test.end(), test2.begin(), test2.end());
 	print_vector<Awesome>(test);
-	// test.insert(test.begin(), test2.begin(), test2.end());
+	test.insert(test.begin(), test2.begin(), test2.end());
 	test2 = test;
 	print_vector<Awesome>(test);
 	std::cout << "end awesome test" << std::endl;
@@ -260,20 +260,20 @@ void	awesome_tests(void)
 
 int main()
 {
-	push_pop_back_tests<int>();
-	resize_tests<int>();
+	// push_pop_back_tests<int>();
+	// resize_tests<int>();
 	insert_tests<int>();
-	reserve_tests<int>();
-	copy_swap_tests<int>();
-	reverse_it_tests<int>();
-	erase_clear_tests<int>();
-	max_size_tests();
-	push_pop_back_tests<Awesome>();
-	resize_tests<Awesome>();
-	// insert_tests<Awesome>();
-	reserve_tests<Awesome>();
-	copy_swap_tests<Awesome>();
-	reverse_it_tests<Awesome>();
-	erase_clear_tests<Awesome>();
-	awesome_tests();
+	// reserve_tests<int>();
+	// copy_swap_tests<int>();
+	// reverse_it_tests<int>();
+	// erase_clear_tests<int>();
+	// max_size_tests();
+	// push_pop_back_tests<Awesome>();
+	// resize_tests<Awesome>();
+	insert_tests<Awesome>();
+	// reserve_tests<Awesome>();
+	// copy_swap_tests<Awesome>();
+	// reverse_it_tests<Awesome>();
+	// erase_clear_tests<Awesome>();
+	// awesome_tests();
 }
