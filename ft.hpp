@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:31:47 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/21 16:26:44 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/29 18:58:32 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include <string>
 # include <iostream>
 # include "vector.hpp"
-// # include "stack.hpp"
+# include "stack.hpp"
 // # include "map.hpp"
 
 #endif

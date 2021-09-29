@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:04 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/28 19:12:29 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/29 19:35:57 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ class stack
 {
 	public :
 
-		typedef container_type			Container;
-		typedef value_type				Container::value_type;
-		typedef size_type				Container::size_type;
-		typedef reference				Container::reference;
-		typedef const_reference			Container::const_reference;
+		typedef Container								container_type;
+		typedef typename Container::value_type			value_type;
+		typedef typename Container::size_type			size_type;
+		typedef typename Container::reference			reference;
+		typedef typename Container::const_reference		const_reference;
 
 		explicit stack(const Container& container = Container()) : _container(container)
 		{}
@@ -42,18 +42,18 @@ class stack
 
 		stack& operator=( const stack& rhs )
 		{
-			this._container = rhs._container;
+			_container = rhs._container;
 			return *this;
 		}
 
 		reference top()
 		{
-			return _container.top();
+			return _container.back();
 		}
 
 		const_reference top() const
 		{
-			return _container.top();
+			return _container.back();
 		}
 
 		bool empty() const
@@ -68,15 +68,15 @@ class stack
 
 		void push( const value_type& value )
 		{
-			_container.push(value);
+			_container.push_back(value);
 		}
 
 		void pop()
 		{
-			_container.pop();
+			_container.pop_back();
 		}
 
-	private:
+	protected:
 
 		Container	_container;
 };

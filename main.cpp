@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/23 17:34:12 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/29 19:24:24 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <vector>
 #include <ctime>
 #include <cstdlib>
+#include <stack>
 
 using namespace ft;
 
@@ -58,6 +59,21 @@ void	print_vector(vector<T> &test)
 			std::cout << std::endl;
 	}
 	std::cout << std::endl;
+}
+
+template <class T, class Container>
+void	print_stack(stack<T, Container> &test)
+{
+	stack<T, Container>	save = test;
+	const T const_top = save.top();
+
+	std::cout << "const top: " << const_top << std::endl;
+
+	while (!save.empty())
+	{
+		std::cout << "top : " << save.top() << " - size : " << save.size() << std::endl;
+		save.pop();
+	}
 }
 
 template <class T>
@@ -258,11 +274,37 @@ void	awesome_tests(void)
 	std::cout << "end awesome test" << std::endl;
 }
 
+void	stack_tests(void)
+{
+	std::cout << std::endl << "STACK TESTS" << std::endl;
+	vector<Awesome> test(21, 12);
+	stack<Awesome, vector<Awesome> > test2(test);
+	print_stack<Awesome, vector<Awesome> >(test2);
+	// vector<Awesome> test2;
+	// print_vector<Awesome>(test2);
+	// test2.push_back(12);
+	// test2.push_back(8);
+	// test2.push_back(16);
+	// print_vector<Awesome>(test2);
+	// std::cout << "SAME ?" << (test.begin() + 1 == test2.begin() + 1) << std::endl;
+	// test.assign(test2.begin(), test2.end());
+	// print_vector<Awesome>(test);
+	// test = test2;
+	// print_vector<Awesome>(test);
+	// std::cout << "SAME ?" << (test.begin() + 1 == test2.begin() + 1) << std::endl;
+	// test.insert(test.end(), test2.begin(), test2.end());
+	// print_vector<Awesome>(test);
+	// test.insert(test.begin(), test2.begin(), test2.end());
+	// test2 = test;
+	// print_vector<Awesome>(test);
+	// std::cout << "end awesome test" << std::endl;
+}
+
 int main()
 {
 	// push_pop_back_tests<int>();
 	// resize_tests<int>();
-	insert_tests<int>();
+	// insert_tests<int>();
 	// reserve_tests<int>();
 	// copy_swap_tests<int>();
 	// reverse_it_tests<int>();
@@ -270,10 +312,11 @@ int main()
 	// max_size_tests();
 	// push_pop_back_tests<Awesome>();
 	// resize_tests<Awesome>();
-	insert_tests<Awesome>();
+	// insert_tests<Awesome>();
 	// reserve_tests<Awesome>();
 	// copy_swap_tests<Awesome>();
 	// reverse_it_tests<Awesome>();
 	// erase_clear_tests<Awesome>();
 	// awesome_tests();
+	stack_tests();
 }
