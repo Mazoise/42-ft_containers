@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/29 19:24:24 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/30 18:50:05 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,8 @@ void	insert_tests()
 	vector<T> test(1, 1);
 	vector<T> test2(5, 5);
 
+	test.insert(test.begin(), 70);
+	print_vector<T>(test);
 	test.insert(test.begin(), 200, 12);
 	print_vector<T>(test);
 	test.insert(test.begin() + 12, 200, 30);
@@ -131,7 +133,9 @@ void	insert_tests()
 	print_vector<T>(test);
 	test.insert(test.end() - 1, 0, 60);
 	print_vector<T>(test);
-	test.insert(test.end() - 1, 1, 70);
+	test.insert(test.end() - 1, 70);
+	print_vector<T>(test);
+	test.insert(test.end() - 1, 70);
 	print_vector<T>(test);
 	test.insert(test.begin() + 412, test2.begin(), test2.end());
 	print_vector<T>(test);
@@ -304,7 +308,7 @@ int main()
 {
 	// push_pop_back_tests<int>();
 	// resize_tests<int>();
-	// insert_tests<int>();
+	insert_tests<int>();
 	// reserve_tests<int>();
 	// copy_swap_tests<int>();
 	// reverse_it_tests<int>();
@@ -312,11 +316,11 @@ int main()
 	// max_size_tests();
 	// push_pop_back_tests<Awesome>();
 	// resize_tests<Awesome>();
-	// insert_tests<Awesome>();
+	insert_tests<Awesome>();
 	// reserve_tests<Awesome>();
 	// copy_swap_tests<Awesome>();
 	// reverse_it_tests<Awesome>();
 	// erase_clear_tests<Awesome>();
 	// awesome_tests();
-	stack_tests();
+	// stack_tests();
 }

@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:04 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/29 19:35:57 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/30 15:17:56 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,46 +76,41 @@ class stack
 			_container.pop_back();
 		}
 
+		friend bool operator==( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
+		{
+			return (lhs._container == rhs._container);
+		}
+
+		friend bool operator!=( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
+		{
+			return (lhs._container != rhs._container);
+		}
+
+		friend bool operator<( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
+		{
+			return (lhs._container < rhs._container);
+		}
+
+		friend bool operator<=( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
+		{
+			return (lhs._container <= rhs._container);
+		}
+
+		friend bool operator>( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
+		{
+			return (lhs._container > rhs._container);
+		}
+
+		friend bool operator>=( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
+		{
+			return (lhs._container >= rhs._container);
+		}
+
 	protected:
 
 		Container	_container;
 };
 
-template< class T, class Container >
-bool operator==( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
-{
-	return (lhs._container == rhs._container);
-}
-
-template< class T, class Container >
-bool operator!=( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
-{
-	return (lhs._container != rhs._container);
-}
-
-template< class T, class Container >
-bool operator<( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
-{
-	return (lhs._container < rhs._container);
-}
-
-template< class T, class Container >
-bool operator<=( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
-{
-	return (lhs._container <= rhs._container);
-}
-
-template< class T, class Container >
-bool operator>( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
-{
-	return (lhs._container > rhs._container);
-}
-
-template< class T, class Container >
-bool operator>=( const stack<T,Container>& lhs, const stack<T,Container>& rhs )
-{
-	return (lhs._container >= rhs._container);
-}
 
 }
 

@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/23 17:39:08 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/09/30 18:48:59 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,12 @@ class vector
 		{
 			if (_capacity)
 			{
+				std::cerr << "size : " << _size << std::endl;
 				for (size_type i = 0; i < _size; i++)
+				{
+					// std::cerr << i << " : " << _value[i] << std::endl;
 					_alloc.destroy(&_value[i]);
+				}
 				_alloc.deallocate(_value, _capacity);
 			}
 		}
@@ -139,14 +143,14 @@ class vector
 		{ return at(n); }
 		reference at (size_type n)
 		{
-			if (n > _size)
+			if (n >= _size)
 				throw std::out_of_range("");
 			else
 				return _value[n];
 		}
 		const_reference at (size_type n) const
 		{
-			if (n > _size)
+			if (n >= _size)
 				throw std::out_of_range("");
 			else
 				return _value[n];
@@ -215,8 +219,9 @@ class vector
 		{
 			size_type	len = last - first;
 			position = prepare_insert(position, len);
-			for (iterator it = position; it != position + len; it++)
+			for (iterator it = position; first != last; it++)
 			{
+				std::cerr << "COUCOU" << std::endl;
 				_alloc.construct(&(*it), *first);
 				first++;
 			}
@@ -241,7 +246,7 @@ class vector
 			for (iterator it = first; it != last; it++)
 				_alloc.destroy(&(*it));
 			for (iterator it = first; it != end() - len; it++)
-				*it = *(it + len);
+					*it = *(it + len);
 			_size -= len;
 			return (first);
 		}
@@ -332,29 +337,40 @@ class vector
 				position = begin() + diff;
 				_old_capacity = old_capacity;
 				_size += n;
-				if (_size - n)
+				if (_size > n)
 				{
 					size_type	old_i = _old_size - 1;
 					for (size_type i = _size - 1; i > diff + n - 1; i--)
 					{
 						_alloc.construct(&_value[i], _old_value[old_i]);
+						// std::cerr << i << " : " << _value[i] << std::endl;
 						old_i--;
 					}
-					old_i = 0;
-					for (size_type i = 0; i  < diff; i++)
+					for (size_type i = 0; i < diff; i++)
 					{
-						_alloc.construct(&_value[i], _old_value[old_i]);			
-						old_i++;
+						_alloc.construct(&_value[i], _old_value[i]);			
+						// std::cerr << i << " : " << _value[i] << std::endl;
+
 					}
 				}				
 			}
 			else
 			{
 				_size += n;
-				if (_size - n)
+				if (_size > n)
 				{
 					for (iterator it = end() - 1; it != position + n - 1; it--)
-						*it = *(it - n);
+					{
+						// std::cerr << "bou" << std::endl;
+						if (n == 1)
+						{
+							_alloc.construct(&(*it), *(it - n));
+							_alloc.destroy(&(*(it - n)));
+						}
+						else
+							*it = *(it - n);
+						// std::cerr << it - begin() << " : " << *it << "no realloc" << std::endl;
+					}
 				}
 			}
 			return (position);
