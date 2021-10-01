@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/30 18:50:05 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/01 17:08:28 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,20 +24,20 @@ class Awesome {
 
 	public:
 
-		Awesome( void ) : _n( 42 ) { std::cout << "Default constructor" << std::endl; }
-		Awesome( int n ) : _n( n ) { std::cout << "Int constructor" << std::endl; (void)n; }
-		Awesome( Awesome const &rhs ) : _n( 42 ) { *this = rhs; std::cout << "Copy constructor" << std::endl; }
-		virtual ~Awesome(void) { std::cout << "Destructor" << std::endl; }
+		Awesome( void ) : _n( 42 ) { std::cout << "Default C " << std::endl; }
+		Awesome( int n ) : _n( n ) { std::cout << "Int C " << std::endl; (void)n; }
+		Awesome( Awesome const &rhs ) : _n( 42 ) { *this = rhs; std::cout << "Copy C " << std::endl; }
+		virtual ~Awesome(void) { std::cout << "D " << std::endl; }
 
-		Awesome &operator=( Awesome const & rhs ) { this->_n = rhs._n; return (*this); }
-		bool operator==( Awesome const & rhs ) const { return (this->_n == rhs._n); }
-		bool operator!=( Awesome const & rhs ) const { return (this->_n != rhs._n); }
-		bool operator>( Awesome const & rhs ) const { return (this->_n > rhs._n); }
-		bool operator<( Awesome const & rhs ) const { return (this->_n < rhs._n); }
-		bool operator>=( Awesome const & rhs ) const { return (this->_n >= rhs._n); }
-		bool operator<=( Awesome const & rhs ) const { return (this->_n <= rhs._n); }
+		Awesome &operator=( Awesome const & rhs ) { _n = rhs._n; return (*this); }
+		bool operator==( Awesome const & rhs ) const { return (_n == rhs._n); }
+		bool operator!=( Awesome const & rhs ) const { return (_n != rhs._n); }
+		bool operator>( Awesome const & rhs ) const { return (_n > rhs._n); }
+		bool operator<( Awesome const & rhs ) const { return (_n < rhs._n); }
+		bool operator>=( Awesome const & rhs ) const { return (_n >= rhs._n); }
+		bool operator<=( Awesome const & rhs ) const { return (_n <= rhs._n); }
 		void operator+=(int rhs){ _n += rhs; }
-		int get( void ) const { return this->_n; }
+		int get( void ) const { return _n; }
 
 	private:
 
@@ -135,13 +135,18 @@ void	insert_tests()
 	print_vector<T>(test);
 	test.insert(test.end() - 1, 70);
 	print_vector<T>(test);
-	test.insert(test.end() - 1, 70);
+	test.insert(test.begin(), 70);
+	print_vector<T>(test);
+	test.insert(test.begin() + 2, 70);
 	print_vector<T>(test);
 	test.insert(test.begin() + 412, test2.begin(), test2.end());
 	print_vector<T>(test);
 	test.insert(test.begin() + 6, test2.begin(), test2.end());
 	print_vector<T>(test);
 	test.insert(test.end(), test2.begin(), test2.end());
+	print_vector<T>(test);
+	T myarray [] = { 501,502,503 };
+  	test.insert (test.begin(), myarray, myarray+3);
 	print_vector<T>(test);
 }
 
@@ -316,7 +321,7 @@ int main()
 	// max_size_tests();
 	// push_pop_back_tests<Awesome>();
 	// resize_tests<Awesome>();
-	insert_tests<Awesome>();
+	// insert_tests<Awesome>();
 	// reserve_tests<Awesome>();
 	// copy_swap_tests<Awesome>();
 	// reverse_it_tests<Awesome>();

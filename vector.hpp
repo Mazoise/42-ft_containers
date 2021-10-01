@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/30 18:48:59 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/01 17:14:06 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ class vector
 		{
 			if (_capacity)
 			{
-				std::cerr << "size : " << _size << std::endl;
 				for (size_type i = 0; i < _size; i++)
 				{
 					// std::cerr << i << " : " << _value[i] << std::endl;
@@ -124,13 +123,9 @@ class vector
 				if (_capacity)
 				{
 					for (size_type i = 0; i < _size; i++)
-					{
 						_alloc.construct(&tmp[i], _value[i]);
-					}
 					for (size_type i = 0; i < _size; i++)
-					{
 						_alloc.destroy(&_value[i]);
-					}
 					_alloc.deallocate(_value, _capacity);
 				}
 				_value = tmp;
@@ -204,38 +199,37 @@ class vector
 		{ erase(end() - 1); }
 		iterator insert (iterator position, const_reference val)
 		{
-			insert(position, 1, val);
-			return (position);
+			position = prepare_insert(position, 1, val);
+			*position = val;
+			destroy_dealloc_old();
+			return(position);
 		}
 		void insert (iterator position, size_type n, const_reference val)
 		{
-			position = prepare_insert(position, n);
+			position = prepare_insert(position, n, val);
 			for (iterator it = position; it != position + n; it++)
-				_alloc.construct(&(*it), val);
+				*it = val;
 			destroy_dealloc_old();
 		}
 		template <class InputIterator>
 		void insert (iterator position, InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last)
 		{
 			size_type	len = last - first;
-			position = prepare_insert(position, len);
+			position = prepare_insert(position, len, *first);
 			for (iterator it = position; first != last; it++)
 			{
-				std::cerr << "COUCOU" << std::endl;
-				_alloc.construct(&(*it), *first);
+				*it = *first;
 				first++;
 			}
 			destroy_dealloc_old();
 		}
 		iterator erase (iterator position)
 		{
-			_alloc.destroy(&(*position));
 			for (iterator it = position; it != end() - 1; it++)
 			{
 				*it = *(it + 1);
 			}
-			if (position == end() - 1)
-				_alloc.destroy(&(*position));
+			_alloc.destroy(&_value[_size - 1]);
 			_size--;
 			return (position);
 		}
@@ -243,10 +237,10 @@ class vector
 		{
 			size_type	len = last - first;
 
-			for (iterator it = first; it != last; it++)
-				_alloc.destroy(&(*it));
 			for (iterator it = first; it != end() - len; it++)
 					*it = *(it + len);
+			for (iterator it = end() - len; it != end(); it++)
+				_alloc.destroy(&(*it));
 			_size -= len;
 			return (first);
 		}
@@ -306,6 +300,7 @@ class vector
 			_old_capacity = _capacity;
 			_old_size = _size;
 		}
+
 		void	destroy_dealloc_old()
 		{
 			if (_old_capacity)
@@ -319,15 +314,13 @@ class vector
 				_old_capacity = 0;
 			}
 		}
-		iterator	prepare_insert(iterator position, size_type n)
+
+		iterator	prepare_insert(iterator position, size_type n, value_type val)
 		{
 			size_type		diff = position - begin();
-			size_type		old_capacity;
 
 			if (_capacity < _size + n)
 			{
-				old_capacity = _capacity;
-				_capacity = 0;
 				if (n == 1 && !_size)
 					reserve_no_destroy(1);
 				else if (_size << 1 < _size + n)
@@ -335,44 +328,15 @@ class vector
 				else
 					reserve_no_destroy(_size << 1);
 				position = begin() + diff;
-				_old_capacity = old_capacity;
-				_size += n;
-				if (_size > n)
-				{
-					size_type	old_i = _old_size - 1;
-					for (size_type i = _size - 1; i > diff + n - 1; i--)
-					{
-						_alloc.construct(&_value[i], _old_value[old_i]);
-						// std::cerr << i << " : " << _value[i] << std::endl;
-						old_i--;
-					}
-					for (size_type i = 0; i < diff; i++)
-					{
-						_alloc.construct(&_value[i], _old_value[i]);			
-						// std::cerr << i << " : " << _value[i] << std::endl;
-
-					}
-				}				
 			}
-			else
+			for (size_type i = _size; i < _size + n; i++)
+				_alloc.construct(&_value[i], val);
+			for (size_type i = _size + n - 1; i > diff + n - 1; i--)
 			{
-				_size += n;
-				if (_size > n)
-				{
-					for (iterator it = end() - 1; it != position + n - 1; it--)
-					{
-						// std::cerr << "bou" << std::endl;
-						if (n == 1)
-						{
-							_alloc.construct(&(*it), *(it - n));
-							_alloc.destroy(&(*(it - n)));
-						}
-						else
-							*it = *(it - n);
-						// std::cerr << it - begin() << " : " << *it << "no realloc" << std::endl;
-					}
-				}
+				_value[i] = _value[i - n];
+				// std::cerr << i << " : " << _value[i] << std::endl;
 			}
+			_size += n;
 			return (position);
 		}
 };
