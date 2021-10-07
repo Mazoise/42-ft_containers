@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/01 17:08:28 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/07 19:46:17 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -311,21 +311,21 @@ void	stack_tests(void)
 
 int main()
 {
-	// push_pop_back_tests<int>();
-	// resize_tests<int>();
+	push_pop_back_tests<int>();
+	resize_tests<int>();
 	insert_tests<int>();
-	// reserve_tests<int>();
-	// copy_swap_tests<int>();
-	// reverse_it_tests<int>();
-	// erase_clear_tests<int>();
-	// max_size_tests();
-	// push_pop_back_tests<Awesome>();
-	// resize_tests<Awesome>();
-	// insert_tests<Awesome>();
-	// reserve_tests<Awesome>();
-	// copy_swap_tests<Awesome>();
-	// reverse_it_tests<Awesome>();
-	// erase_clear_tests<Awesome>();
-	// awesome_tests();
-	// stack_tests();
+	reserve_tests<int>();
+	copy_swap_tests<int>();
+	reverse_it_tests<int>();
+	erase_clear_tests<int>();
+	max_size_tests();
+	push_pop_back_tests<Awesome>();
+	resize_tests<Awesome>();
+	insert_tests<Awesome>();
+	reserve_tests<Awesome>();
+	copy_swap_tests<Awesome>();
+	reverse_it_tests<Awesome>();
+	erase_clear_tests<Awesome>();
+	awesome_tests();
+	stack_tests();
 }

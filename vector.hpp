@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/01 17:14:06 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/07 19:47:13 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ class vector
 		typedef std::ptrdiff_t										difference_type;
 		typedef value_type&											reference;
 		typedef const value_type&									const_reference;
-		typedef value_type*											pointer;
-		typedef const value_type*									const_pointer;
+		typedef typename Alloc::pointer								pointer;
+		typedef const typename Alloc::pointer						const_pointer;
 		typedef vector_iterator<value_type>							iterator;
 		typedef vector_iterator<const value_type>					const_iterator;
 		typedef rev_vector_iterator<iterator>						reverse_iterator;
