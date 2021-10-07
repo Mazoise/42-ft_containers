@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/07 19:47:13 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/08 00:36:36 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,9 @@ class vector
 		: _value(0), _size(0), _capacity(0), _alloc(alloc), _old_capacity(0)
 		{ assign(first, last); }
 
-		vector (const vector& x)
+		vector (const vector& rhs)
 		: _value(0), _size(0), _capacity(0), _old_capacity(0)
-		{ *this = x; }
+		{ *this = rhs; }
 
 		virtual ~vector (void)
 		{
@@ -70,11 +70,14 @@ class vector
 			}
 		}
 
-		vector& operator= (const vector& x)
+		vector& operator= (const vector& rhs)
 		{
-			_alloc = x._alloc;
-			assign(x.begin(), x.end());
-			return (*this);
+			if (&rhs != this)
+			{
+				_alloc = rhs._alloc;
+				assign(rhs.begin(), rhs.end());
+			}
+			return *this;
 		}
 		iterator begin (void)
 		{ return iterator(_value[0]); }
@@ -231,7 +234,7 @@ class vector
 			}
 			_alloc.destroy(&_value[_size - 1]);
 			_size--;
-			return (position);
+			return position;
 		}
 		iterator erase (iterator first, iterator last)
 		{
@@ -242,7 +245,7 @@ class vector
 			for (iterator it = end() - len; it != end(); it++)
 				_alloc.destroy(&(*it));
 			_size -= len;
-			return (first);
+			return first;
 		}
 		void swap (vector& x) //swap with other vector !
 		{
@@ -337,7 +340,7 @@ class vector
 				// std::cerr << i << " : " << _value[i] << std::endl;
 			}
 			_size += n;
-			return (position);
+			return position;
 		}
 };
 
@@ -351,19 +354,17 @@ template <class T, class Alloc>
 bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
 	if (lhs.size() != rhs.size())
-		return (false);
+		return false;
 	for (typename vector<T, Alloc>::size_type	i = 0; i < lhs.size(); i++)
 		if (lhs[i] != rhs[i])
-			return(false);
-	return (true);
+			return false;
+	return true;
 }
 
 template <class T, class Alloc>
 bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
-	if (lhs == rhs)
-		return (false);
-	return (true);
+	return (!(lhs == rhs));
 }
 
 template <class T, class Alloc>
@@ -374,9 +375,9 @@ bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	for (i = 0; i < lhs.size(); i++)
 	{
 		if (i == rhs.size() || rhs[i] < lhs[i])
-			return (false);
+			return false;
 		else if (lhs[i] < rhs[i])
-			return (true);
+			return true;
 	}
 	return (i != rhs.size());
 }
@@ -384,25 +385,19 @@ bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 template <class T, class Alloc>
 bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
-	if (lhs > rhs)
-		return (false);
-	return (true);
+	return (!(lhs > rhs));
 }
 
 template <class T, class Alloc>
 bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
-	if (lhs == rhs || lhs < rhs)
-		return (false);
-	return (true);
+	return (!(lhs == rhs || lhs < rhs));
 }
 
 template <class T, class Alloc>
 bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
-		if (lhs < rhs)
-		return (false);
-	return (true);
+	return (!(lhs < rhs));
 }
 
 }

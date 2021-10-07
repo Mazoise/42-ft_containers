@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/07 20:12:57 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/08 00:38:22 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ class map
 
 			bool operator()(const value_type& lhs, const value_type& rhs) const
 			{
-				return (_comp(lhs.first, rhs.first));
+				return _comp(lhs.first, rhs.first);
 			}
 		protected :
 
@@ -61,12 +61,30 @@ class map
 		map() : _map(0), _size(0), _comp(key_compare()),_alloc(allocator_type()) {}
 		explicit map(const Compare& comp, const Allocator& alloc = Allocator()) : _map(0), _size(0), _comp(comp),_alloc(alloc) {}
 		template<class InputIt>
-		map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator());
-		map(const map& other);
-		~map();
-		map& operator=(const map& other);
-		allocator_type get_allocator() const;
-
+		map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _map(0), _size(0), _comp(comp),_alloc(alloc)
+		{
+			insert(first, last);
+		}
+		map(const map& rhs)
+		{
+			_map = rhs;
+		}
+		~map() {}
+		map& operator=(const map& rhs)
+		{
+			if (&rhs != this)
+			{
+				_alloc = rhs._alloc;
+				_comp = rhs._comp;
+				clear();
+				insert(rhs.begin(), rhs.end());
+			}
+			return *this;
+		}
+		allocator_type get_allocator() const
+		{
+			return _alloc;
+		}
 		T& at(const Key& key);
 		const T& at(const Key& key ) const;
 		T& operator[](const Key& key);
@@ -79,9 +97,18 @@ class map
 		reverse_iterator rend();
 		const_reverse_iterator rend() const;
 
-		bool empty() const;
-		size_type size() const;
-		size_type max_size() const;
+		bool empty() const
+		{
+			return(!_size);
+		}
+		size_type size() const
+		{
+			return _size;
+		}
+		size_type max_size() const
+		{
+			return _alloc.max_size();
+		}
 		void clear();
 		std::pair<iterator, bool> insert(const value_type& value);
 		iterator insert(iterator hint, const value_type& value);
@@ -102,8 +129,14 @@ class map
 		iterator upper_bound(const Key& key);
 		const_iterator upper_bound(const Key& key) const;
 
-		key_compare key_comp() const;
-		value_compare value_comp() const;
+		key_compare key_comp() const
+		{
+			return _comp;
+		}
+		value_compare value_comp() const
+		{
+			return value_compare(_comp);
+		}
 
 	private :
 
