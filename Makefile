@@ -6,48 +6,58 @@
 #    By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/03/03 18:59:18 by mchardin          #+#    #+#              #
-#    Updated: 2021/03/03 19:00:13 by mchardin         ###   ########.fr        #
+#    Updated: 2021/10/08 16:18:20 by mchardin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-PREFIX		=	./
+PREFIX				=	./tests/
 
-SRCS		=	$(addprefix $(PREFIX), \
-								main.cpp \
-								)
+SRCS				=	$(addprefix $(PREFIX), \
+										vector_tests.cpp \
+										stack_tests.cpp \
+										main.cpp \
+										)
 
-OBJS		=	${SRCS:.cpp=.o}
+OBJS				=	${SRCS:.cpp=.o}
 
-DEPS		=	${OBJS:.o=.d}
+DEPS				=	${OBJS:.o=.d}
 
-CXX			=	clang++
+CXX					=	clang++
 
-CXXFLAGS	=	-Werror -Wextra -Wall -std=c++98 -MMD
+CXXFLAGS			=	-Werror -Wextra -Wall -std=c++98  -D FT -MMD -I $(PREFIX)
 
-NAME 		=	ft_containers
+CXXFLAGS_STD		=	-Werror -Wextra -Wall -std=c++98 -MMD -I $(PREFIX)
 
-RM			=	rm -f
+NAME 				=	ft_containers
+
+STD_NAME			=	std_containers
+
+RM					=	rm -f
 
 all:
-			${MAKE} ${NAME}
+					${MAKE} ${NAME}
 
-${NAME}:	${OBJS}
-			${CXX} ${CXXFLAGS} ${OBJS} -o ${NAME}
+${NAME}:			${OBJS}
+					${CXX} ${CXXFLAGS} ${OBJS} -o ${NAME}
 
-run:		all
-			./$(NAME)
+${STD_NAME}:		${OBJS}
+					${CXX} ${CXXFLAGS_STD} ${OBJS} -o ${STD_NAME}
 
-clean:
-			${RM} ${OBJS}
-			${RM} ${DEPS}
+run:				all
+					./$(NAME)
 
-fclean:
-			${RM} ${OBJS}
-			${RM} ${DEPS}
-			${RM} ${NAME}
+clean:		
+					${RM} ${OBJS}
+					${RM} ${DEPS}
 
-re:			fclean all
+fclean:		
+					${RM} ${OBJS}
+					${RM} ${DEPS}
+					${RM} ${NAME}
+					${RM} ${STD_NAME}
 
-.PHONY: 	all re run clean fclean
+re:					fclean all
 
--include	${DEPS}
+.PHONY: 			all re run clean fclean
+
+-include			${DEPS}

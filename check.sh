@@ -1,17 +1,25 @@
 #!/bin/bash
 
-make
-cp main.cpp tests.cpp
-sed -i -e "s/using namespace ft/using namespace std/g" tests.cpp
-clang++ -Wall -Wextra -Werror -std=c++98 tests.cpp -o test_containers
+clang++ tests/vector_tests.cpp tests/stack_tests.cpp tests/main.cpp -Werror -Wextra -Wall -std=c++98  -D FT -I ./tests -o ft_containers
+clang++ tests/vector_tests.cpp tests/stack_tests.cpp tests/main.cpp -Werror -Wextra -Wall -std=c++98 -I ./tests -o std_containers
 ./ft_containers > my_res
-./test_containers > test_res
+./std_containers > test_res
 echo -e "\033[31m"
-if [ -s my_res ]; then
-    diff my_res test_res  #  > diff
+if [ -s test_res ]; then
+	if [ -s my_res ]; then
+    	diff my_res test_res > diff
+	else 
+		echo -e "ERROR IN YOUR CODE"
+	fi
 else
-    echo -e "ERROR"
+    echo -e "ERROR IN TEST CODE"
+fi
+if [ -s diff ]; then
+	echo -e "CHECK DIFF FILE FOR ERRORS"
+else
+	echo -e "\033[32mOK!"
 fi
 echo -e "\033[0m"
-rm test_containers tests.cpp test_res my_res
-make fclean
+
+# rm -f test_res my_res
+rm -f ft_containers std_containers **.o
