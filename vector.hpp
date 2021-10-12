@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/08 00:36:36 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/12 14:15:39 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,7 @@ class vector
 		void assign (InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last)
 		{
 			size_type	len = last - first;
-			save_old();
+			_save_old();
 			if (_capacity < len)
 			{
 				_capacity = 0;
@@ -179,11 +179,11 @@ class vector
 				i++;
 			}
 			_size = i;
-			destroy_dealloc_old();
+			_destroy_dealloc_old();
 		}
 		void assign (size_type n, const_reference val)
 		{
-			save_old();
+			_save_old();
 			if (_capacity < n)
 			{
 				_capacity = 0;
@@ -194,7 +194,7 @@ class vector
 				_alloc.construct(&_value[i], val);
 			}
 			_size = n;
-			destroy_dealloc_old();
+			_destroy_dealloc_old();
 		}
 		void push_back (const_reference val)
 		{ insert(end(), val); }
@@ -202,29 +202,29 @@ class vector
 		{ erase(end() - 1); }
 		iterator insert (iterator position, const_reference val)
 		{
-			position = prepare_insert(position, 1, val);
+			position = _prepare_insert(position, 1, val);
 			*position = val;
-			destroy_dealloc_old();
+			_destroy_dealloc_old();
 			return(position);
 		}
 		void insert (iterator position, size_type n, const_reference val)
 		{
-			position = prepare_insert(position, n, val);
+			position = _prepare_insert(position, n, val);
 			for (iterator it = position; it != position + n; it++)
 				*it = val;
-			destroy_dealloc_old();
+			_destroy_dealloc_old();
 		}
 		template <class InputIterator>
 		void insert (iterator position, InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last)
 		{
 			size_type	len = last - first;
-			position = prepare_insert(position, len, *first);
+			position = _prepare_insert(position, len, *first);
 			for (iterator it = position; first != last; it++)
 			{
 				*it = *first;
 				first++;
 			}
-			destroy_dealloc_old();
+			_destroy_dealloc_old();
 		}
 		iterator erase (iterator position)
 		{
@@ -278,13 +278,13 @@ class vector
 		size_type												_old_size;
 		size_type												_old_capacity;
 
-		void	reserve_no_destroy(size_type n)
+		void	_reserve_no_destroy(size_type n)
 		{
 			if (n > _alloc.max_size())
 				throw (std::length_error("vector::reserve"));
 			if (n > _capacity)
 			{
-				save_old();
+				_save_old();
 				_value = _alloc.allocate(n);
 
 				if (_capacity)
@@ -297,14 +297,14 @@ class vector
 				_capacity = n;
 			}
 		}
-		void	save_old(void)
+		void	_save_old(void)
 		{
 			_old_value = _value;
 			_old_capacity = _capacity;
 			_old_size = _size;
 		}
 
-		void	destroy_dealloc_old()
+		void	_destroy_dealloc_old()
 		{
 			if (_old_capacity)
 			{
@@ -318,18 +318,18 @@ class vector
 			}
 		}
 
-		iterator	prepare_insert(iterator position, size_type n, value_type val)
+		iterator	_prepare_insert(iterator position, size_type n, value_type val)
 		{
 			size_type		diff = position - begin();
 
 			if (_capacity < _size + n)
 			{
 				if (n == 1 && !_size)
-					reserve_no_destroy(1);
+					_reserve_no_destroy(1);
 				else if (_size << 1 < _size + n)
-					reserve_no_destroy(_size + n);
+					_reserve_no_destroy(_size + n);
 				else
-					reserve_no_destroy(_size << 1);
+					_reserve_no_destroy(_size << 1);
 				position = begin() + diff;
 			}
 			for (size_type i = _size; i < _size + n; i++)

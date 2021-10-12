@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:31:47 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/08 16:14:44 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/12 16:02:45 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 	#include <vector>
 	namespace ft = std;
 # else
-	// #include "../map.hpp"
+	#include "../map.hpp"
 	#include "../stack.hpp"
 	#include "../vector.hpp"
 # endif
@@ -56,5 +56,6 @@ class Awesome {
 
 void	vector_tests(void);
 void	stack_tests(void);
+void	map_tests(void);
 
 #endif

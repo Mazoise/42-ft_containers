@@ -1,7 +1,7 @@
 #!/bin/bash
 
-clang++ tests/vector_tests.cpp tests/stack_tests.cpp tests/main.cpp -Werror -Wextra -Wall -std=c++98  -D FT -I ./tests -o ft_containers
-clang++ tests/vector_tests.cpp tests/stack_tests.cpp tests/main.cpp -Werror -Wextra -Wall -std=c++98 -I ./tests -o std_containers
+clang++ tests/vector_tests.cpp tests/stack_tests.cpp tests/map_tests.cpp tests/main.cpp -Werror -Wextra -Wall -std=c++98  -D FT -I ./tests -o ft_containers
+clang++ tests/vector_tests.cpp tests/stack_tests.cpp tests/map_tests.cpp tests/main.cpp -Werror -Wextra -Wall -std=c++98 -I ./tests -o std_containers
 ./ft_containers > my_res
 ./std_containers > test_res
 echo -e "\033[31m"
