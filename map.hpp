@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/12 16:31:54 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/14 00:25:45 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ class map
 				element *		_child[2];
 				element *		_parent;
 				bool			_color;
-			
+				
 				element() : _value(0), _parent(0), _color(RED)
 				{
 					_child[LEFT] = 0;
@@ -85,6 +85,9 @@ class map
 		size_type			_size;
 		key_compare			_comp;
 		allocator_type		_alloc;
+		size_t			_osef;
+		size_t			_osef2;
+		size_t			_osef3;
 
 	public :
 
@@ -106,8 +109,8 @@ class map
 				Compare _comp;
 		};
 
-		map() : _root(0), _size(0), _comp(key_compare()),_alloc(allocator_type()) {}
-		explicit map(const Compare& comp, const Allocator& alloc = Allocator()) : _root(0), _size(0), _comp(comp),_alloc(alloc) {}
+		map() : _root(0), _size(0), _comp(key_compare()),_alloc(allocator_type()), _osef(0), _osef2(0), _osef3(0) {}
+		explicit map(const Compare& comp, const Allocator& alloc = Allocator()) : _root(0), _size(0), _comp(comp),_alloc(alloc), _osef(0), _osef2(0), _osef3(0) {}
 		// template<class InputIt>
 		// map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _root(0), _size(0), _comp(comp),_alloc(alloc)
 		// {
@@ -160,10 +163,13 @@ class map
 		void clear();
 		void insert(const value_type& value) // WARNING : return std::pair<iterator, bool> not void
 		{
+			// check if key exists here, do not replace value
 			value_type *new_value = new value_type(value); // replace with allocator
 			element *	new_elem = new element(new_value);
 			_simple_insert(new_elem);
 			_red_black(new_elem);
+			_size++;
+			std::cerr << "ROOT : " << _root->_value->first << " - color : " << _root->_color << std::endl;
 		} //rewrite pair
 		// iterator insert(iterator hint, const value_type& value);
 		// template<class InputIt>
@@ -243,7 +249,7 @@ class map
 				elem->_color = BLACK;
 				return ;
 			}
-			while(elem->_parent->_color == RED)
+			while(elem != _root && elem->_parent->_color == RED)
 			{
 				if (elem->_parent->_parent->_child[RIGHT] == elem->_parent)
 					dir = RIGHT;
@@ -267,7 +273,7 @@ class map
 					elem = elem->_parent->_parent;
 					_rotate(elem, !dir);
 				}
-				
+				_root->_color = BLACK;
 			}
 		}
 };
