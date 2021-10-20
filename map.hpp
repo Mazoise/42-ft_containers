@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/14 00:25:45 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/14 12:20:29 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,9 +91,9 @@ class map
 
 	public :
 
-		class value_compare : public std::binary_function<value_type, value_type, bool>
+		class value_compare : public std::binary_function<value_type, value_type, bool> // recode binary function?
 		{
-			friend class map;
+			friend class map; // allowed?
 			public :
 				typedef bool							result_type;
 				typedef value_type						first_argument_type;
@@ -182,8 +182,8 @@ class map
 		size_type count(const Key& key) const;
 		// iterator find(const Key& key);
 		// const_iterator find(const Key& key) const;
-		// std::pair<iterator,iterator> equal_range(const Key& key);
-		// std::pair<const_iterator,const_iterator> equal_range(const Key& key) const;
+		// std::pair<iterator, iterator> equal_range(const Key& key);
+		// std::pair<const_iterator, const_iterator> equal_range(const Key& key) const;
 		// iterator lower_bound(const Key& key);
 		// const_iterator lower_bound(const Key& key) const;
 		// iterator upper_bound(const Key& key);

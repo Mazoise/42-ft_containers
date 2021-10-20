@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/09/23 15:06:11 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/20 17:38:23 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,25 @@
 # define VECTOR_ITERATOR_HPP
 
 # include <iostream>
+# include "iterator.hpp" 
 
 namespace ft
 {
 
 template < class T>
-class vector_iterator // : public std::iterator<std::random_access_iterator_tag, T>
+class vector_iterator : public iterator<random_access_iterator_tag, T>
 {
 	public :
 
-		typedef T				value_type;
-		typedef std::ptrdiff_t	difference_type; //?
+		typedef std::ptrdiff_t						difference_type;
+		typedef T									value_type;
+		typedef T*									pointer;
+		typedef T&									reference;
+		typedef random_access_iterator_tag			iterator_category;
 
 		vector_iterator(void) : _value(0) {}
-		vector_iterator(value_type& value) : _value(&value) {}
-		vector_iterator(value_type* value) : _value(value) {}
+		vector_iterator(reference value) : _value(&value) {}
+		vector_iterator(pointer value) : _value(value) {}
 		vector_iterator(const vector_iterator& rhs) : _value(rhs._value) {}
 		virtual ~vector_iterator(void) {}
 
@@ -37,7 +41,7 @@ class vector_iterator // : public std::iterator<std::random_access_iterator_tag,
 			return vector_iterator<const T>(*_value);
 		}
 
-		vector_iterator&		operator=(value_type* rhs)
+		vector_iterator&		operator=(pointer rhs)
 		{
 			_value = rhs;
 			return (*this);
@@ -61,11 +65,11 @@ class vector_iterator // : public std::iterator<std::random_access_iterator_tag,
 		bool						operator>=(const vector_iterator& rhs) const
 		{ return (_value >= rhs._value); }
 
-		value_type&					operator*(void) const
+		reference					operator*(void) const
 		{ return *_value; }
-		value_type*					operator->(void) const
+		pointer					operator->(void) const
 		{ return _value; }
-		value_type&					operator[](difference_type rhs) const
+		reference					operator[](difference_type rhs) const
 		{ return _value[rhs]; }
 
 		vector_iterator&		operator+=(difference_type rhs)
@@ -112,7 +116,7 @@ class vector_iterator // : public std::iterator<std::random_access_iterator_tag,
 
 	private :
 
-		value_type* _value;
+		pointer _value;
 };
 
 template < class Iterator>
@@ -122,10 +126,12 @@ class rev_vector_iterator
 
 		typedef typename Iterator::value_type			value_type;
 		typedef typename Iterator::difference_type		difference_type;
+		typedef typename Iterator::pointer				pointer;
+		typedef typename Iterator::reference			reference;
 
 		rev_vector_iterator(void) : _value(0) {}
-		rev_vector_iterator(value_type* value) : _value(value) {}
-		rev_vector_iterator(value_type& value) : _value(&value) {}
+		rev_vector_iterator(pointer value) : _value(value) {}
+		rev_vector_iterator(reference value) : _value(&value) {}
 		rev_vector_iterator(const rev_vector_iterator& rhs) : _value(rhs._value) {}
 		virtual ~rev_vector_iterator(void) {}
 
@@ -134,7 +140,7 @@ class rev_vector_iterator
 			return rev_vector_iterator<const Iterator>(*_value);
 		}
 
-		rev_vector_iterator&		operator=(value_type* rhs)
+		rev_vector_iterator&		operator=(pointer rhs)
 		{
 			_value = rhs;
 			return (*this);
@@ -158,11 +164,11 @@ class rev_vector_iterator
 		bool						operator>=(const rev_vector_iterator& rhs) const
 		{ return (_value <= rhs._value); }
 
-		value_type&					operator*(void) const
+		reference					operator*(void) const
 		{ return *_value; }
-		value_type*					operator->(void) const
+		pointer					operator->(void) const
 		{ return _value; }
-		value_type&					operator[](difference_type rhs) const
+		reference					operator[](difference_type rhs) const
 		{ return _value[rhs]; }
 
 		rev_vector_iterator&		operator+=(difference_type rhs)
@@ -208,7 +214,7 @@ class rev_vector_iterator
 
 	private :
 
-		value_type* _value;
+		pointer _value;
 };
 
 }
