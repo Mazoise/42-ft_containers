@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/20 17:38:23 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/20 22:22:30 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,12 @@ class vector_iterator : public iterator<random_access_iterator_tag, T>
 		vector_iterator&		operator=(pointer rhs)
 		{
 			_value = rhs;
-			return (*this);
+			return *this;
 		}
 		vector_iterator&		operator=(const vector_iterator& rhs)
 		{
 			_value = rhs._value;
-			return (*this);
+			return *this;
 		}
 
 		bool						operator==(const vector_iterator& rhs) const
@@ -75,12 +75,12 @@ class vector_iterator : public iterator<random_access_iterator_tag, T>
 		vector_iterator&		operator+=(difference_type rhs)
 		{
 			_value += rhs;
-			return (*this);
+			return *this;
 		}
 		vector_iterator&		operator-=(difference_type rhs)
 		{
 			_value -= rhs;
-			return (*this);
+			return *this;
 		}
 
 		vector_iterator		operator+(difference_type rhs) const
@@ -94,24 +94,24 @@ class vector_iterator : public iterator<random_access_iterator_tag, T>
 		vector_iterator&		operator++(void)
 		{
 			++_value;
-			return (*this);
+			return *this;
 		}
 		vector_iterator		operator++(int rhs)
 		{
 			(void)rhs;
 			++_value;
-			return (*this);
+			return *this;
 		}
 		vector_iterator&		operator--(void)
 		{
 			--_value;
-			return (*this);
+			return *this;
 		}
 		vector_iterator		operator--(int rhs)
 		{
 			(void)rhs;
 			--_value;
-			return (*this);
+			return *this;
 		}
 
 	private :
@@ -143,12 +143,12 @@ class rev_vector_iterator
 		rev_vector_iterator&		operator=(pointer rhs)
 		{
 			_value = rhs;
-			return (*this);
+			return *this;
 		}
 		rev_vector_iterator&		operator=(const rev_vector_iterator& rhs)
 		{
 			_value = rhs._value;
-			return (*this);
+			return *this;
 		}
 
 		bool						operator==(const rev_vector_iterator& rhs) const
@@ -174,12 +174,12 @@ class rev_vector_iterator
 		rev_vector_iterator&		operator+=(difference_type rhs)
 		{
 			_value -= rhs;
-			return (*this);
+			return *this;
 		}
 		rev_vector_iterator&		operator-=(difference_type rhs)
 		{
 			_value += rhs;
-			return (*this);
+			return *this;
 		}
 		rev_vector_iterator		operator+(difference_type rhs) const
 		{ return (rev_vector_iterator(_value - rhs)); }
@@ -192,24 +192,24 @@ class rev_vector_iterator
 		rev_vector_iterator&		operator++(void)
 		{
 			--_value;
-			return (*this);
+			return *this;
 		}
 		rev_vector_iterator		operator++(int rhs)
 		{
 			(void)rhs;
 			--_value;
-			return (*this);
+			return *this;
 		}
 		rev_vector_iterator&		operator--(void)
 		{
 			++_value;
-			return (*this);
+			return *this;
 		}
 		rev_vector_iterator		operator--(int rhs)
 		{
 			(void)rhs;
 			++_value;
-			return (*this);
+			return *this;
 		}
 
 	private :

@@ -6,100 +6,19 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/20 20:50:35 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/20 23:18:47 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MAP_HPP
 # define MAP_HPP
 
-#include "vector_iterator.hpp"
+#include "map_iterator.hpp"
 #include "enableIf.hpp"
 #include <limits>
-#define BLACK 0
-#define RED 1
-#define LEFT 0
-#define RIGHT 1
 
 namespace ft
 {
-template<class T>
-class	element
-		{
-			public :
-
-				typedef T		value_type;
-				typedef T*		pointer;
-
-				element() : _value(0), _parent(0), _color(RED)
-				{
-					_child[LEFT] = 0;
-					_child[RIGHT] = 0;
-				}
-				element(value_type * value) : _value(value), _parent(0), _color(RED)
-				{
-					_child[LEFT] = 0;
-					_child[RIGHT] = 0;
-				}
-				element(const element &	rhs)
-				{
-					*this = rhs;
-				}
-				element & operator=(const element & rhs)
-				{
-					_value = rhs._value;
-					_child[LEFT] = rhs._child[LEFT];
-					_child[RIGHT] = rhs._child[RIGHT];
-					_parent = rhs._parent;
-					_color = rhs._color;
-					return *this;
-				}
-				element *get_child(bool dir) { return _child[dir]; }
-				element *get_parent() { return _parent; }
-				element *get_grand_parent()
-				{
-					if (_parent)
-						return (_parent->get_parent());
-					return (0);
-				}
-				element *get_brother()
-				{
-					if (!_parent)
-						return (0);
-					return (_parent->get_child(!get_side()));
-				}
-				element *get_uncle()
-				{
-					element * tmp = get_parent();
-					if (!tmp)
-						return (0);
-					return (tmp->get_brother());
-				}
-				pointer get_value() { return _value; }
-				bool	get_color() { return _color; }
-				bool	get_side()
-				{
-					if (!_parent)
-						return (0);
-					if (_parent->get_child(RIGHT) == this)
-						return(RIGHT);
-					return (LEFT);
-				}
-				void	set_child(element *rhs, bool dir) { _child[dir] = rhs; }
-				void	set_brother(element *rhs) { get_brother() = rhs; }
-				void	set_parent(element *rhs) { _parent = rhs; }
-				void	set_grand_parent(element *rhs) { get_grand_parent() = rhs; }
-				void	set_uncle(element *rhs) { get_uncle() = rhs; }
-				void	set_color(bool rhs) { _color = rhs; }
-				void	set_value(pointer rhs) { _value = rhs; }
-
-			private:
-		
-				pointer			_value;
-				element *	_child[2];
-				element *	_parent;
-				bool			_color;
-		};
 
 template< class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<std::pair<const Key, T> > >
 class map
@@ -117,7 +36,7 @@ class map
 		typedef const value_type&					const_reference;
 		typedef typename Allocator::pointer			pointer;
 		typedef typename Allocator::const_pointer	const_pointer;
-		// typedef map_iterator<value_type>			iterator;
+		typedef map_iterator<value_type>			iterator;
 		// typedef map_iterator<const value_type>		const_iterator;
 		// typedef rev_map_iterator<iterator>			reverse_iterator;
 		// typedef rev_map_iterator<const_iterator>	const_reverse_iterator;
@@ -152,10 +71,16 @@ class map
 				Compare _comp;
 		};
 
-		map() : _root(0), _size(0), _comp(key_compare()),_alloc(allocator_type()), _osef(0), _osef2(0), _osef3(0) {}
-		explicit map(const Compare& comp, const Allocator& alloc = Allocator()) : _root(0), _size(0), _comp(comp),_alloc(alloc), _osef(0), _osef2(0), _osef3(0) {}
+		map() : _size(0), _comp(key_compare()),_alloc(allocator_type())
+		{
+			_root = new element<value_type>();
+		}
+		explicit map(const Compare& comp, const Allocator& alloc = Allocator()) : _size(0), _comp(comp), _alloc(alloc)
+		{
+			_root = new element<value_type>();
+		}
 		// template<class InputIt>
-		// map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _root(0), _size(0), _comp(comp),_alloc(alloc)
+		// map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _size(0), _comp(comp),_alloc(alloc)
 		// {
 		// 	insert(first, last);
 		// }
@@ -179,12 +104,21 @@ class map
 		{
 			return _alloc;
 		}
-		T& at(const Key& key);
-		const T& at(const Key& key ) const;
-		T& operator[](const Key& key);
-		// iterator begin();
+		// T& at(const Key& key);
+		// const T& at(const Key& key ) const;
+		// T& operator[](const Key& key);
+		iterator begin()
+		{
+			element<value_type> * tmp = _root;
+			while(tmp->get_child(LEFT))
+				tmp = tmp->get_child(LEFT);
+			return(iterator(tmp));
+		}
 		// const_iterator begin() const;
-		// iterator end();
+		iterator end()
+		{
+			return(iterator(_end()));
+		}
 		// const_iterator end() const;
 		// reverse_iterator rbegin();
 		// const_reverse_iterator rbegin() const;
@@ -206,12 +140,19 @@ class map
 		void clear();
 		void insert(const value_type& value) // WARNING : return std::pair<iterator, bool> not void
 		{
+			element<value_type> *	end_elem = _end();
+			std::cerr << "BEFORE" << std::endl;
+			if (_end() != _root)
+				_end()->get_parent()->set_child(0, RIGHT);
+			std::cerr << "AFTER" << std::endl;
 			// check if key exists here, do not replace value
 			value_type *new_value = new value_type(value); // replace with allocator
 			element<value_type> *	new_elem = new element<value_type>(new_value);
 			_simple_insert(new_elem);
 			_red_black(new_elem);
 			_size++;
+			end_elem->set_parent(_end());
+			_end()->set_child(end_elem, RIGHT);
 			std::cerr << "ROOT : " << _root->get_value()->first << " - color : " << _root->get_color() << std::endl;
 		} //rewrite pair
 		// iterator insert(iterator hint, const value_type& value);
@@ -243,6 +184,14 @@ class map
 
 	private :
 
+		element<value_type> *	_end()
+		{
+			element<value_type> * tmp = _root;
+			while(tmp->get_child(RIGHT))
+				tmp = tmp->get_child(RIGHT);
+			return tmp;
+		}
+
 		void	_rotate(element<value_type> * rhs, bool dir)
 		{
 			element<value_type> * tmp = rhs->get_child(!dir);
@@ -264,14 +213,14 @@ class map
 			element<value_type>	*	i = _root;
 			bool		dir;
 
-			if (!_root)
+			if (!_root->get_value())
 			{
 				_root = new_elem;
 				return ;
 			}
 			while (i)
 			{
-				dir = value_compare(_comp)(*(new_elem->get_value()), *(i->get_value())); // check order
+				dir = value_compare(_comp)(*(i->get_value()), *(new_elem->get_value())); // check order
 				if (i->get_child(dir))
 					i = i->get_child(dir);
 				else
