@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/14 12:20:29 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/20 20:50:35 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,83 @@
 
 namespace ft
 {
+template<class T>
+class	element
+		{
+			public :
+
+				typedef T		value_type;
+				typedef T*		pointer;
+
+				element() : _value(0), _parent(0), _color(RED)
+				{
+					_child[LEFT] = 0;
+					_child[RIGHT] = 0;
+				}
+				element(value_type * value) : _value(value), _parent(0), _color(RED)
+				{
+					_child[LEFT] = 0;
+					_child[RIGHT] = 0;
+				}
+				element(const element &	rhs)
+				{
+					*this = rhs;
+				}
+				element & operator=(const element & rhs)
+				{
+					_value = rhs._value;
+					_child[LEFT] = rhs._child[LEFT];
+					_child[RIGHT] = rhs._child[RIGHT];
+					_parent = rhs._parent;
+					_color = rhs._color;
+					return *this;
+				}
+				element *get_child(bool dir) { return _child[dir]; }
+				element *get_parent() { return _parent; }
+				element *get_grand_parent()
+				{
+					if (_parent)
+						return (_parent->get_parent());
+					return (0);
+				}
+				element *get_brother()
+				{
+					if (!_parent)
+						return (0);
+					return (_parent->get_child(!get_side()));
+				}
+				element *get_uncle()
+				{
+					element * tmp = get_parent();
+					if (!tmp)
+						return (0);
+					return (tmp->get_brother());
+				}
+				pointer get_value() { return _value; }
+				bool	get_color() { return _color; }
+				bool	get_side()
+				{
+					if (!_parent)
+						return (0);
+					if (_parent->get_child(RIGHT) == this)
+						return(RIGHT);
+					return (LEFT);
+				}
+				void	set_child(element *rhs, bool dir) { _child[dir] = rhs; }
+				void	set_brother(element *rhs) { get_brother() = rhs; }
+				void	set_parent(element *rhs) { _parent = rhs; }
+				void	set_grand_parent(element *rhs) { get_grand_parent() = rhs; }
+				void	set_uncle(element *rhs) { get_uncle() = rhs; }
+				void	set_color(bool rhs) { _color = rhs; }
+				void	set_value(pointer rhs) { _value = rhs; }
+
+			private:
+		
+				pointer			_value;
+				element *	_child[2];
+				element *	_parent;
+				bool			_color;
+		};
 
 template< class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<std::pair<const Key, T> > >
 class map
@@ -47,47 +124,13 @@ class map
 
 	private :
 
-		class	element
-		{
-			friend class map;
-			public :
-				pointer			_value;
-				element *		_child[2];
-				element *		_parent;
-				bool			_color;
-				
-				element() : _value(0), _parent(0), _color(RED)
-				{
-					_child[LEFT] = 0;
-					_child[RIGHT] = 0;
-				}
-				element(value_type * value) : _value(value), _parent(0), _color(RED)
-				{
-					_child[LEFT] = 0;
-					_child[RIGHT] = 0;
-				}
-				element(const element &	rhs)
-				{
-					*this = rhs;
-				}
-				element & operator=(const element & rhs)
-				{
-					_value = rhs._value;
-					_child[LEFT] = rhs._child[LEFT];
-					_child[RIGHT] = rhs._child[RIGHT];
-					_parent = rhs._parent;
-					_color = rhs._color;
-					return(*this);
-				}
-		};
-
-		element *			_root;
-		size_type			_size;
-		key_compare			_comp;
-		allocator_type		_alloc;
-		size_t			_osef;
-		size_t			_osef2;
-		size_t			_osef3;
+		element<value_type> *	_root;
+		size_type				_size;
+		key_compare				_comp;
+		allocator_type			_alloc;
+		size_t					_osef;
+		size_t					_osef2;
+		size_t					_osef3;
 
 	public :
 
@@ -165,11 +208,11 @@ class map
 		{
 			// check if key exists here, do not replace value
 			value_type *new_value = new value_type(value); // replace with allocator
-			element *	new_elem = new element(new_value);
+			element<value_type> *	new_elem = new element<value_type>(new_value);
 			_simple_insert(new_elem);
 			_red_black(new_elem);
 			_size++;
-			std::cerr << "ROOT : " << _root->_value->first << " - color : " << _root->_color << std::endl;
+			std::cerr << "ROOT : " << _root->get_value()->first << " - color : " << _root->get_color() << std::endl;
 		} //rewrite pair
 		// iterator insert(iterator hint, const value_type& value);
 		// template<class InputIt>
@@ -200,25 +243,25 @@ class map
 
 	private :
 
-		void	_rotate(element * rhs, bool dir)
+		void	_rotate(element<value_type> * rhs, bool dir)
 		{
-			element * tmp = rhs->_child[!dir];
-			rhs->_child[!dir] = rhs->_child[!dir]->_child[dir];
-			if (rhs->_child[!dir])
-				rhs->_child[!dir]->_parent = rhs;
-			tmp->_child[dir] = rhs;
-			tmp->_parent = rhs->_parent;
-			if (!tmp->_parent)
+			element<value_type> * tmp = rhs->get_child(!dir);
+			rhs->set_child(rhs->get_child(!dir)->get_child(dir), !dir);
+			if (rhs->get_child(!dir))
+				rhs->get_child(!dir)->set_parent(rhs);
+			tmp->set_child(rhs, dir);
+			tmp->set_parent(rhs->get_parent());
+			if (!tmp->get_parent())
 				_root = tmp;
-			else if (rhs->_parent->_child[dir] == rhs)
-				rhs->_parent->_child[dir] = tmp;
+			else if (rhs->get_parent()->get_child(dir) == rhs)
+				rhs->get_parent()->set_child(tmp, dir);
 			else
-				rhs->_parent->_child[!dir] = tmp;
-			rhs->_parent = tmp;
+				rhs->get_parent()->set_child(tmp, !dir);
+			rhs->set_parent(tmp);
 		}
-		void	_simple_insert(element * new_elem)
+		void	_simple_insert(element<value_type> * new_elem)
 		{
-			element	*	i = _root;
+			element<value_type>	*	i = _root;
 			bool		dir;
 
 			if (!_root)
@@ -228,52 +271,51 @@ class map
 			}
 			while (i)
 			{
-				dir = value_compare(_comp)(*(new_elem->_value), *(i->_value)); // check order
-				if (i->_child[dir])
-					i = i->_child[dir];
+				dir = value_compare(_comp)(*(new_elem->get_value()), *(i->get_value())); // check order
+				if (i->get_child(dir))
+					i = i->get_child(dir);
 				else
 				{
-					i->_child[dir] = new_elem;
-					new_elem->_parent = i;
+					i->set_child(new_elem, dir);
+					new_elem->set_parent(i);
 					return ;
 				}
 			}
 		}
-		void	_red_black(element * elem)
+		void	_red_black(element<value_type> * elem)
 		{
 			bool			dir = LEFT;
-			element *		uncle;
+			element<value_type> *		uncle;
 	
 			if (_root == elem)
 			{
-				elem->_color = BLACK;
+				elem->set_color(BLACK);
 				return ;
 			}
-			while(elem != _root && elem->_parent->_color == RED)
+			while(elem != _root && elem->get_parent()->get_color() == RED)
 			{
-				if (elem->_parent->_parent->_child[RIGHT] == elem->_parent)
-					dir = RIGHT;
-				uncle = elem->_parent->_parent->_child[!dir];
-				if (uncle && uncle->_color == RED)
+				uncle = elem->get_uncle();
+				dir = elem->get_parent()->get_side();
+				if (uncle && uncle->get_color() == RED)
 				{
-					elem->_parent->_color = BLACK;
-					uncle->_color = BLACK;
-					uncle->_parent->_color = RED;
-					elem = uncle->_parent;
+					elem->get_parent()->set_color(BLACK);
+					uncle->set_color(BLACK);
+					uncle->get_parent()->set_color(RED);
+					elem = elem->get_grand_parent();
 				}
-				else if (elem == elem->_parent->_child[!dir])
+				else if (elem->get_side() == !dir)
 				{
-					elem = elem->_parent;
+					elem = elem->get_parent();
 					_rotate(elem, dir);
 				}
 				else
 				{
-					elem->_parent->_color = BLACK;
-					elem->_parent->_parent->_color = RED;
-					elem = elem->_parent->_parent;
+					elem->get_parent()->set_color(BLACK);
+					elem->get_grand_parent()->set_color(RED);
+					elem = elem->get_grand_parent();
 					_rotate(elem, !dir);
 				}
-				_root->_color = BLACK;
+				_root->set_color(BLACK);
 			}
 		}
 };

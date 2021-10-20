@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/20 17:41:55 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/20 19:38:00 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,40 +56,11 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 		{ return (_value == rhs._value); }
 		bool						operator!=(const map_iterator& rhs) const
 		{ return (_value != rhs._value); }
-		bool						operator<(const map_iterator& rhs) const
-		{ return (_value < rhs._value); }
-		bool						operator>(const map_iterator& rhs) const
-		{ return (_value > rhs._value); }
-		bool						operator<=(const map_iterator& rhs) const
-		{ return (_value <= rhs._value); }
-		bool						operator>=(const map_iterator& rhs) const
-		{ return (_value >= rhs._value); }
 
 		reference					operator*(void) const
 		{ return *_value; }
 		pointer					operator->(void) const
 		{ return _value; }
-		reference					operator[](difference_type rhs) const
-		{ return _value[rhs]; }
-
-		map_iterator&		operator+=(difference_type rhs)
-		{
-			_value += rhs;
-			return (*this);
-		}
-		map_iterator&		operator-=(difference_type rhs)
-		{
-			_value -= rhs;
-			return (*this);
-		}
-
-		map_iterator		operator+(difference_type rhs) const
-		{ return (map_iterator(_value + rhs)); }
-
-		difference_type				operator-(const map_iterator& rhs) const
-		{ return (_value - rhs._value); }
-		map_iterator		operator-(difference_type rhs) const
-		{ return (map_iterator(_value - rhs)); }
 
 		map_iterator&		operator++(void)
 		{
