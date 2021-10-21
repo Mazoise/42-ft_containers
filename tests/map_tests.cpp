@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/12 15:56:14 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/21 09:49:24 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/21 10:17:27 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	print_map( ft::map<key, value> &test)
 	std::cout << std::endl;
 }
 
-void							at_tests(ft::map<int, std::string>	*test)
+void							at_count_tests(ft::map<int, std::string>	*test)
 {
 	test->at(21) = "Bijour21";
 	(*test)[43] = "Bijour43";
@@ -70,9 +70,9 @@ ft::map<int, std::string> *		insert_tests()
 	test2->insert(std::make_pair<int, std::string>(12, "Hello3"));
 	test2->insert(std::make_pair<int, std::string>(15, "Hello4"));
 	test2->insert(std::make_pair<int, std::string>(6, "Hello5"));
-	// test2->insert(std::make_pair<int, std::string>(42, "Hello6"));
+	test2->insert(std::make_pair<int, std::string>(42, "Hello6"));
 	test2->insert(std::make_pair<int, std::string>(43, "Hello7"));
-	// test2->insert(std::make_pair<int, std::string>(43, "Hello8"));
+	test2->insert(std::make_pair<int, std::string>(43, "Hello8"));
 	test2->insert(std::make_pair<int, std::string>(1, "Hello9"));
 	test2->insert(std::make_pair<int, std::string>(-4, "Hello10"));
 	test2->insert(std::make_pair<int, std::string>(8, "Hello11"));
@@ -86,7 +86,7 @@ ft::map<int, std::string> *		insert_tests()
 void	map_tests()
 {
 	ft::map<int, std::string> * test = insert_tests();
-	at_tests(test);
+	at_count_tests(test);
 	// std::cout << test.max_size() << std::endl;
 	// std::cout << test2.max_size() << std::endl;
 }

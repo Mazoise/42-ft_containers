@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/21 09:48:44 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/21 10:56:46 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,39 +103,29 @@ class map
 		}
 		T& at(const Key& key)
 		{
-			element<value_type> * tmp = _root;
-			bool					dir;
+			element<value_type> * tmp = _find(key);
 
-			while (tmp && tmp->get_value())
-			{
-				if (tmp->get_value()->first == key)
-					return (tmp->get_value()->second);
-				dir = key_compare()(tmp->get_value()->first, key);
-				tmp = tmp->get_child(dir);
-			}
-			throw std::out_of_range("");
+			if (tmp)
+				return (tmp->get_value()->second);
+			else
+				throw std::out_of_range("");
 		}
 		const T& at(const Key& key ) const
 		{
-			element<value_type> * tmp = _root;
-			bool					dir;
+			element<value_type> * tmp = _find(key);
 
-			while (tmp && tmp->get_value())
-			{
-				if (tmp->get_value()->first == key)
-					return (tmp->get_value()->second);
-				dir = key_compare()(tmp->get_value()->first, key);
-				tmp = tmp->get_child(dir);
-			}
+			if (tmp)
+				return (tmp->get_value()->second);
+			else
 			throw std::out_of_range("");
 		}
 		T& operator[](const Key& key)
 		{
-			try
-			{
-				return at(key);
-			}
-			catch (std::out_of_range &e)
+			element<value_type> * tmp = _find(key);
+
+			if (tmp)
+				return (tmp->get_value()->second);
+			else
 			{
 				insert(std::make_pair<key_type, mapped_type>(key, mapped_type()));
 				return (at(key));
@@ -177,12 +167,11 @@ class map
 		void clear();
 		void insert(const value_type& value) // WARNING : return std::pair<iterator, bool> not void
 		{
+			if (_find(value.first))
+				return ;
 			element<value_type> *	end_elem = _end();
-			std::cerr << "BEFORE" << std::endl;
 			if (_end() != _root)
 				_end()->get_parent()->set_child(0, RIGHT);
-			std::cerr << "AFTER" << std::endl;
-			// check if key exists here, do not replace value
 			value_type *new_value = new value_type(value); // replace with allocator
 			element<value_type> *	new_elem = new element<value_type>(new_value);
 			_simple_insert(new_elem);
@@ -190,11 +179,10 @@ class map
 			_size++;
 			end_elem->set_parent(_end());
 			_end()->set_child(end_elem, RIGHT);
-			std::cerr << "ROOT : " << _root->get_value()->first << " - color : " << _root->get_color() << std::endl;
 		} //rewrite pair
 		// iterator insert(iterator hint, const value_type& value);
 		template<class InputIt>
-		void insert(InputIt first, InputIt last)
+		void insert(InputIt first, InputIt last) // add enable if 
 		{
 			while(first != last)
 			{
@@ -209,24 +197,110 @@ class map
 
 		size_type count(const Key& key) const
 		{
-			try
-			{
-				at(key);
-				return (1);
-			}
-			catch (std::out_of_range &e)
-			{
-				return (0);
-			}
+			if (_find(key))
+				return 1;
+			return 0;
 		}
-		// iterator find(const Key& key);
-		// const_iterator find(const Key& key) const;
-		// std::pair<iterator, iterator> equal_range(const Key& key);
-		// std::pair<const_iterator, const_iterator> equal_range(const Key& key) const;
-		// iterator lower_bound(const Key& key);
-		// const_iterator lower_bound(const Key& key) const;
-		// iterator upper_bound(const Key& key);
-		// const_iterator upper_bound(const Key& key) const;
+		iterator find(const Key& key)
+		{
+			element<value_type> * tmp = _find(key);
+			if (tmp)
+				return(iterator(tmp));
+			else
+				return(end());
+		}
+		const_iterator find(const Key& key) const
+		{
+			element<value_type> * tmp = _find(key);
+			if (tmp)
+				return(const_iterator(tmp));
+			else
+				return(end());			
+		}
+		std::pair<iterator, iterator> equal_range(const Key& key)
+		{
+			return(std::make_pair<iterator, iterator>(lower_bound(key), upper_bound(key)));
+		}
+		std::pair<const_iterator, const_iterator> equal_range(const Key& key) const
+		{
+			return(std::make_pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key)));
+		}
+		iterator lower_bound(const Key& key)
+		{
+			element<value_type> * tmp = _root;
+			bool					dir;
+
+			while (tmp && tmp->get_value())
+			{
+				if (tmp->get_value()->first == key)
+					return (iterator(tmp));
+				dir = key_compare()(tmp->get_value()->first, key);
+				if (tmp->get_child(dir))
+					tmp = tmp->get_child(dir);
+				else if (dir == RIGHT)
+					return(iterator(tmp));
+				else
+					return(++iterator(tmp));
+			}
+			return(end());
+		}
+		const_iterator lower_bound(const Key& key) const
+		{
+			element<value_type> * tmp = _root;
+			bool					dir;
+
+			while (tmp && tmp->get_value())
+			{
+				if (tmp->get_value()->first == key)
+					return (const_iterator(tmp));
+				dir = key_compare()(tmp->get_value()->first, key);
+				if (tmp->get_child(dir))
+					tmp = tmp->get_child(dir);
+				else if (dir == RIGHT)
+					return(const_iterator(tmp));
+				else
+					return(++const_iterator(tmp));
+			}
+			return(end());
+		}
+		iterator upper_bound(const Key& key)
+		{
+			element<value_type> * tmp = _root;
+			bool					dir;
+
+			while (tmp && tmp->get_value())
+			{
+				if (tmp->get_value()->first == key)
+					return (++iterator(tmp));
+				dir = key_compare()(tmp->get_value()->first, key);
+				if (tmp->get_child(dir))
+					tmp = tmp->get_child(dir);
+				else if (dir == RIGHT)
+					return(iterator(tmp));
+				else
+					return(++iterator(tmp));
+			}
+			return(end());
+		}
+		const_iterator upper_bound(const Key& key) const
+		{
+			element<value_type> * tmp = _root;
+			bool					dir;
+
+			while (tmp && tmp->get_value())
+			{
+				if (tmp->get_value()->first == key)
+					return (++const_iterator(tmp));
+				dir = key_compare()(tmp->get_value()->first, key);
+				if (tmp->get_child(dir))
+					tmp = tmp->get_child(dir);
+				else if (dir == RIGHT)
+					return(const_iterator(tmp));
+				else
+					return(++const_iterator(tmp));
+			}
+			return(end());
+		}
 
 		key_compare key_comp() const
 		{
@@ -239,20 +313,35 @@ class map
 
 	private :
 
-		element<value_type> *	_end()
+		element<value_type> *	_end() const
 		{
 			element<value_type> * tmp = _root;
 			while(tmp->get_child(RIGHT))
 				tmp = tmp->get_child(RIGHT);
 			return tmp;
 		}
-		element<value_type> *	_begin()
+		element<value_type> *	_begin() const
 		{
 			element<value_type> * tmp = _root;
 			while(tmp->get_child(LEFT))
 				tmp = tmp->get_child(LEFT);
 			return tmp;
 		}
+		element<value_type> *	_find(key_type key) const
+		{
+			element<value_type> * tmp = _root;
+			bool					dir;
+
+			while (tmp && tmp->get_value())
+			{
+				if (tmp->get_value()->first == key)
+					return (tmp);
+				dir = key_compare()(tmp->get_value()->first, key);
+				tmp = tmp->get_child(dir);
+			}
+			return 0;
+		}
+		
 		void	_rotate(element<value_type> * rhs, bool dir)
 		{
 			element<value_type> * tmp = rhs->get_child(!dir);
@@ -330,17 +419,26 @@ class map
 		}
 };
 
-// template<class Key, class T, class Compare, class Alloc>
-// bool operator==(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)
-// {
-// 	return (0);
-// }
+template<class Key, class T, class Compare, class Alloc>
+bool operator==(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)
+{
+	if (lhs.size() != rhs.size())
+		return false;
+	typename  ft::map<Key,T,Compare,Alloc>::iterator		it2 = rhs.begin();
+	for (typename  ft::map<Key,T,Compare,Alloc>::iterator it = lhs.begin(); it != lhs.end(); it++)
+	{
+		if (*it != *it2)
+			return false;
+		it2++;
+	}
+	return true;
+}
 
-// template<class Key, class T, class Compare, class Alloc>
-// bool operator!=(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)
-// {
-// 	return (0);
-// }
+template<class Key, class T, class Compare, class Alloc>
+bool operator!=(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)
+{
+	return !(lhs == rhs);
+}
 
 // template<class Key, class T, class Compare, class Alloc>
 // bool operator<(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)

@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/20 23:08:23 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/21 10:18:18 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ class	element
 				void	set_uncle(element *rhs) { get_uncle() = rhs; }
 				void	set_color(bool rhs) { _color = rhs; }
 				void	set_value(pointer rhs) { _value = rhs; }
-				bool	no_child() { return (!_child[LEFT] && !_child[RIGHT]); }
 
 			private:
 		
@@ -175,7 +174,6 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 		element<value_type> *	_neighbor(bool dir)
 		{
 			element<value_type> * tmp = _elem;
-			std::cerr << "KEY : " << _elem->get_value()->first << " VALUE : " << _elem->get_value()->second << std::endl;
 			if (tmp->get_child(dir))
 			{
 				tmp = tmp->get_child(dir);

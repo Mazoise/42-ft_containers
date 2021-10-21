@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/20 16:35:22 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/21 10:58:04 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ class vector
 			{
 				for (size_type i = 0; i < _size; i++)
 				{
-					// std::cerr << i << " : " << _value[i] << std::endl;
 					_alloc.destroy(&_value[i]);
 				}
 				_alloc.deallocate(_value, _capacity);
@@ -337,7 +336,6 @@ class vector
 			for (size_type i = _size + n - 1; i > diff + n - 1; i--)
 			{
 				_value[i] = _value[i - n];
-				// std::cerr << i << " : " << _value[i] << std::endl;
 			}
 			_size += n;
 			return position;
@@ -372,9 +370,11 @@ bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
 	typename vector<T, Alloc>::size_type		i;
 
+	if (lhs.size() < rhs.size())
+		return true;
 	for (i = 0; i < lhs.size(); i++)
 	{
-		if (i == rhs.size() || rhs[i] < lhs[i])
+		if (rhs[i] < lhs[i])
 			return false;
 		else if (lhs[i] < rhs[i])
 			return true;
