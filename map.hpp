@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/20 23:18:47 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/21 09:48:44 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ class map
 		typedef typename Allocator::pointer			pointer;
 		typedef typename Allocator::const_pointer	const_pointer;
 		typedef map_iterator<value_type>			iterator;
-		// typedef map_iterator<const value_type>		const_iterator;
+		typedef map_iterator<const value_type>		const_iterator;
 		// typedef rev_map_iterator<iterator>			reverse_iterator;
 		// typedef rev_map_iterator<const_iterator>	const_reverse_iterator;
 
@@ -47,9 +47,6 @@ class map
 		size_type				_size;
 		key_compare				_comp;
 		allocator_type			_alloc;
-		size_t					_osef;
-		size_t					_osef2;
-		size_t					_osef3;
 
 	public :
 
@@ -73,17 +70,17 @@ class map
 
 		map() : _size(0), _comp(key_compare()),_alloc(allocator_type())
 		{
-			_root = new element<value_type>();
+			_root = new element<value_type>(); // alloc
 		}
 		explicit map(const Compare& comp, const Allocator& alloc = Allocator()) : _size(0), _comp(comp), _alloc(alloc)
 		{
-			_root = new element<value_type>();
+			_root = new element<value_type>(); // alloc
 		}
-		// template<class InputIt>
-		// map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _size(0), _comp(comp),_alloc(alloc)
-		// {
-		// 	insert(first, last);
-		// }
+		template<class InputIt>
+		map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _size(0), _comp(comp),_alloc(alloc)
+		{
+			insert(first, last);
+		}
 		map(const map& rhs)
 		{
 			_root = rhs;
@@ -104,22 +101,62 @@ class map
 		{
 			return _alloc;
 		}
-		// T& at(const Key& key);
-		// const T& at(const Key& key ) const;
-		// T& operator[](const Key& key);
-		iterator begin()
+		T& at(const Key& key)
 		{
 			element<value_type> * tmp = _root;
-			while(tmp->get_child(LEFT))
-				tmp = tmp->get_child(LEFT);
-			return(iterator(tmp));
+			bool					dir;
+
+			while (tmp && tmp->get_value())
+			{
+				if (tmp->get_value()->first == key)
+					return (tmp->get_value()->second);
+				dir = key_compare()(tmp->get_value()->first, key);
+				tmp = tmp->get_child(dir);
+			}
+			throw std::out_of_range("");
 		}
-		// const_iterator begin() const;
+		const T& at(const Key& key ) const
+		{
+			element<value_type> * tmp = _root;
+			bool					dir;
+
+			while (tmp && tmp->get_value())
+			{
+				if (tmp->get_value()->first == key)
+					return (tmp->get_value()->second);
+				dir = key_compare()(tmp->get_value()->first, key);
+				tmp = tmp->get_child(dir);
+			}
+			throw std::out_of_range("");
+		}
+		T& operator[](const Key& key)
+		{
+			try
+			{
+				return at(key);
+			}
+			catch (std::out_of_range &e)
+			{
+				insert(std::make_pair<key_type, mapped_type>(key, mapped_type()));
+				return (at(key));
+			}
+		}
+		iterator begin()
+		{
+			return(iterator(_begin()));
+		}
+		const_iterator begin() const
+		{
+			return(const_iterator(_begin()));
+		}
 		iterator end()
 		{
 			return(iterator(_end()));
 		}
-		// const_iterator end() const;
+		const_iterator end() const
+		{
+			return(const_iterator(_end()));
+		}
 		// reverse_iterator rbegin();
 		// const_reverse_iterator rbegin() const;
 		// reverse_iterator rend();
@@ -156,14 +193,32 @@ class map
 			std::cerr << "ROOT : " << _root->get_value()->first << " - color : " << _root->get_color() << std::endl;
 		} //rewrite pair
 		// iterator insert(iterator hint, const value_type& value);
-		// template<class InputIt>
-		// void insert(InputIt first, InputIt last);
+		template<class InputIt>
+		void insert(InputIt first, InputIt last)
+		{
+			while(first != last)
+			{
+				insert(*first);
+				first++;
+			}
+		}
 		// void erase(iterator pos);
 		// void erase(iterator first, iterator last);
 		size_type erase(const key_type& key);
 		void swap(map& other);
 
-		size_type count(const Key& key) const;
+		size_type count(const Key& key) const
+		{
+			try
+			{
+				at(key);
+				return (1);
+			}
+			catch (std::out_of_range &e)
+			{
+				return (0);
+			}
+		}
 		// iterator find(const Key& key);
 		// const_iterator find(const Key& key) const;
 		// std::pair<iterator, iterator> equal_range(const Key& key);
@@ -191,7 +246,13 @@ class map
 				tmp = tmp->get_child(RIGHT);
 			return tmp;
 		}
-
+		element<value_type> *	_begin()
+		{
+			element<value_type> * tmp = _root;
+			while(tmp->get_child(LEFT))
+				tmp = tmp->get_child(LEFT);
+			return tmp;
+		}
 		void	_rotate(element<value_type> * rhs, bool dir)
 		{
 			element<value_type> * tmp = rhs->get_child(!dir);
