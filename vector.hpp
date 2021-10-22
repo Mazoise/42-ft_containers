@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/21 10:58:04 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/22 12:07:16 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define VECTOR_HPP
 
 #include "vector_iterator.hpp"
-#include "enableIf.hpp"
+#include "utils.hpp"
 #include <limits>
 
 namespace ft
@@ -353,10 +353,7 @@ bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
 	if (lhs.size() != rhs.size())
 		return false;
-	for (typename vector<T, Alloc>::size_type	i = 0; i < lhs.size(); i++)
-		if (lhs[i] != rhs[i])
-			return false;
-	return true;
+	return (equal(lhs.begin(), lhs.end(), rhs.begin()));
 }
 
 template <class T, class Alloc>
@@ -368,18 +365,7 @@ bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 template <class T, class Alloc>
 bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
-	typename vector<T, Alloc>::size_type		i;
-
-	if (lhs.size() < rhs.size())
-		return true;
-	for (i = 0; i < lhs.size(); i++)
-	{
-		if (rhs[i] < lhs[i])
-			return false;
-		else if (lhs[i] < rhs[i])
-			return true;
-	}
-	return (i != rhs.size());
+	return (lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 }
 
 template <class T, class Alloc>

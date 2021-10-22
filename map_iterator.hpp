@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/21 10:18:18 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/22 11:59:05 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <iostream>
 # include "iterator.hpp"
+# include "map_utils.hpp"
 # define BLACK 0
 # define RED 1
 # define LEFT 0
@@ -22,84 +23,6 @@
 
 namespace ft
 {
-
-template<class T>
-class	element
-		{
-			public :
-
-				typedef T		value_type;
-				typedef T*		pointer;
-
-				element() : _value(0), _parent(0), _color(RED)
-				{
-					_child[LEFT] = 0;
-					_child[RIGHT] = 0;
-				}
-				element(value_type * value) : _value(value), _parent(0), _color(RED)
-				{
-					_child[LEFT] = 0;
-					_child[RIGHT] = 0;
-				}
-				element(const element &	rhs)
-				{
-					*this = rhs;
-				}
-				element & operator=(const element & rhs)
-				{
-					_value = rhs._value;
-					_child[LEFT] = rhs._child[LEFT];
-					_child[RIGHT] = rhs._child[RIGHT];
-					_parent = rhs._parent;
-					_color = rhs._color;
-					return *this;
-				}
-				element *get_child(bool dir) { return _child[dir]; }
-				element *get_parent() { return _parent; }
-				element *get_grand_parent()
-				{
-					if (_parent)
-						return (_parent->get_parent());
-					return (0);
-				}
-				element *get_brother()
-				{
-					if (!_parent)
-						return (0);
-					return (_parent->get_child(!get_side()));
-				}
-				element *get_uncle()
-				{
-					element * tmp = get_parent();
-					if (!tmp)
-						return (0);
-					return (tmp->get_brother());
-				}
-				pointer get_value() { return _value; }
-				bool	get_color() { return _color; }
-				bool	get_side()
-				{
-					if (!_parent)
-						return (0);
-					if (_parent->get_child(RIGHT) == this)
-						return(RIGHT);
-					return (LEFT);
-				}
-				void	set_child(element *rhs, bool dir) { _child[dir] = rhs; }
-				void	set_brother(element *rhs) { get_brother() = rhs; }
-				void	set_parent(element *rhs) { _parent = rhs; }
-				void	set_grand_parent(element *rhs) { get_grand_parent() = rhs; }
-				void	set_uncle(element *rhs) { get_uncle() = rhs; }
-				void	set_color(bool rhs) { _color = rhs; }
-				void	set_value(pointer rhs) { _value = rhs; }
-
-			private:
-		
-				pointer		_value;
-				element *	_child[2];
-				element *	_parent;
-				bool		_color;
-		};
 
 template < class T >
 class map_iterator : public iterator<bidirectional_iterator_tag, T>

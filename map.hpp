@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/21 10:56:46 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/22 12:07:08 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,20 @@
 # define MAP_HPP
 
 #include "map_iterator.hpp"
-#include "enableIf.hpp"
+#include "utils.hpp"
 #include <limits>
 
 namespace ft
 {
 
-template< class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<std::pair<const Key, T> > >
+template< class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<pair<const Key, T> > >
 class map
 {
 	public :
 
 		typedef Key									key_type;
 		typedef T									mapped_type;
-		typedef std::pair<const Key, T>				value_type;
+		typedef pair<const Key, T>				value_type;
 		typedef std::size_t							size_type;
 		typedef std::ptrdiff_t						difference_type;
 		typedef Compare								key_compare;
@@ -79,13 +79,17 @@ class map
 		template<class InputIt>
 		map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _size(0), _comp(comp),_alloc(alloc)
 		{
+			clear();
 			insert(first, last);
 		}
 		map(const map& rhs)
 		{
-			_root = rhs;
+			*this = rhs;
 		}
-		~map() {}
+		~map()
+		{
+			// clear();
+		}
 		map& operator=(const map& rhs)
 		{
 			if (&rhs != this)
@@ -127,7 +131,7 @@ class map
 				return (tmp->get_value()->second);
 			else
 			{
-				insert(std::make_pair<key_type, mapped_type>(key, mapped_type()));
+				insert(ft::make_pair<key_type, mapped_type>(key, mapped_type()));
 				return (at(key));
 			}
 		}
@@ -164,11 +168,15 @@ class map
 		{
 			return _alloc.max_size();
 		}
-		void clear();
-		void insert(const value_type& value) // WARNING : return std::pair<iterator, bool> not void
+		void clear()
 		{
+			erase(begin(), end());
+		}
+		pair<iterator, bool> insert(const value_type& value)
+		{
+			element<value_type> * tmp = _find(value.first);
 			if (_find(value.first))
-				return ;
+				return (ft::make_pair(iterator(tmp), 0));
 			element<value_type> *	end_elem = _end();
 			if (_end() != _root)
 				_end()->get_parent()->set_child(0, RIGHT);
@@ -179,10 +187,15 @@ class map
 			_size++;
 			end_elem->set_parent(_end());
 			_end()->set_child(end_elem, RIGHT);
+			return (ft::make_pair(iterator(new_elem), 1));
 		} //rewrite pair
-		// iterator insert(iterator hint, const value_type& value);
+		iterator insert(iterator hint, const value_type& value)
+		{
+			(void)hint;
+			insert(value);
+		}
 		template<class InputIt>
-		void insert(InputIt first, InputIt last) // add enable if 
+		void insert(InputIt first, typename ft::enable_if<!isIntegral<InputIt>::value, InputIt>::type last) // add enable if 
 		{
 			while(first != last)
 			{
@@ -190,10 +203,36 @@ class map
 				first++;
 			}
 		}
-		// void erase(iterator pos);
-		// void erase(iterator first, iterator last);
+		// void erase(iterator pos)
+		// {
+		// 	element<value_type> *	end_elem = _end();
+		// 	if (_end() != _root)
+		// 		_end()->get_parent()->set_child(0, RIGHT);
+			
+		// 	_size--;
+		// }
+		void erase(iterator first, iterator last);
 		size_type erase(const key_type& key);
-		void swap(map& other);
+		void swap(map& rhs)
+		{
+			element<value_type> *	tmp_root;
+			size_type				tmp_size;
+			key_compare				tmp_comp;
+			allocator_type			tmp_alloc;
+
+			tmp_comp = _comp;
+			_comp = rhs._comp;
+			rhs._comp = tmp_comp;
+			tmp_root = _root;
+			_root = rhs._root;
+			rhs._root = tmp_root;
+			tmp_size = _size;
+			_size = rhs._size;
+			rhs._size = tmp_size;
+			tmp_alloc = _alloc;
+			_alloc = rhs._alloc;
+			rhs._alloc = tmp_alloc;
+		}
 
 		size_type count(const Key& key) const
 		{
@@ -217,13 +256,13 @@ class map
 			else
 				return(end());			
 		}
-		std::pair<iterator, iterator> equal_range(const Key& key)
+		pair<iterator, iterator> equal_range(const Key& key)
 		{
-			return(std::make_pair<iterator, iterator>(lower_bound(key), upper_bound(key)));
+			return(ft::make_pair<iterator, iterator>(lower_bound(key), upper_bound(key)));
 		}
-		std::pair<const_iterator, const_iterator> equal_range(const Key& key) const
+		pair<const_iterator, const_iterator> equal_range(const Key& key) const
 		{
-			return(std::make_pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key)));
+			return(ft::make_pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key)));
 		}
 		iterator lower_bound(const Key& key)
 		{
@@ -417,6 +456,34 @@ class map
 				_root->set_color(BLACK);
 			}
 		}
+
+		// iterator	_delete(iterator pos) //returns replacement node
+		// {
+		// 	if (!pos->get_child(RIGHT))
+		// 	{
+		// 		pos->get_parent->set_child(pos->get_child(LEFT), pos->get_side())
+		// 		if (pos->get_child(LEFT))
+		// 			pos->get_child(LEFT)->set_parent(pos->get_parent())
+		// 	}
+		// 	else if (!pos->get_child(RIGHT))
+		// 	{
+		// 		pos->get_parent->set_child(pos->get_child(RIGHT), pos->get_side())
+		// 		if (pos->get_child(RIGHT))
+		// 			pos->get_child(RIGHT)->set_parent(pos->get_parent())
+		// 	}
+		// 	else
+		// 	{
+		// 		iterator tmp = pos;
+				
+		// 		pos++;
+		// 		pos->get_parent->set_child(0, pos->get_side());
+		// 		pos->set_parent(tmp->get_parent());
+		// 		tmp->get_parent->set_child(pos, tmp->get_side());
+		// 		pos->set_child(tmp->get_child(LEFT), LEFT);
+
+		// 	}
+			
+		// }
 };
 
 template<class Key, class T, class Compare, class Alloc>
@@ -424,14 +491,7 @@ bool operator==(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,All
 {
 	if (lhs.size() != rhs.size())
 		return false;
-	typename  ft::map<Key,T,Compare,Alloc>::iterator		it2 = rhs.begin();
-	for (typename  ft::map<Key,T,Compare,Alloc>::iterator it = lhs.begin(); it != lhs.end(); it++)
-	{
-		if (*it != *it2)
-			return false;
-		it2++;
-	}
-	return true;
+	return (equal(lhs.begin(), lhs.end(), rhs.begin()));
 }
 
 template<class Key, class T, class Compare, class Alloc>
@@ -440,30 +500,29 @@ bool operator!=(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,All
 	return !(lhs == rhs);
 }
 
-// template<class Key, class T, class Compare, class Alloc>
-// bool operator<(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)
-// {
-// 	return (0);
-// }
+template<class Key, class T, class Compare, class Alloc>
+bool operator<(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)
+{
+	return (lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+}
 
-// template<class Key, class T, class Compare, class Alloc>
-// bool operator<=(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)
-// {
-// 	return (0);
-// }
+template<class Key, class T, class Compare, class Alloc>
+bool operator<=(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)
+{
+	return (!(lhs > rhs));
+}
 
-// template<class Key, class T, class Compare, class Alloc>
-// bool operator>(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)
-// {
-// 	return (0);
-// }
+template<class Key, class T, class Compare, class Alloc>
+bool operator>(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)
+{
+	return (!(lhs == rhs || lhs < rhs));
+}
 
-// template< class Key, class T, class Compare, class Alloc >
-// bool operator>=( const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs )
-// {
-// 	return (0);
-// }
-
+template< class Key, class T, class Compare, class Alloc >
+bool operator>=( const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs )
+{
+	return (!(lhs < rhs));
+}
 
 // template<class Key, class T, class Compare, class Alloc>
 // void swap(map<Key,T,Compare,Alloc>& lhs, map<Key,T,Compare,Alloc>& rhs);
