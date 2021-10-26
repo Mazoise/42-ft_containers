@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/12 15:56:14 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/22 12:03:51 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/26 17:07:06 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,11 @@ void							at_count_tests(ft::map<int, std::string>	*test)
 	std::cout << test->count(42) << std::endl;
 }
 
+void		erase_tests(ft::map<int, std::string>	*test)
+{
+	test->erase(test->begin());
+}
+
 ft::map<int, std::string> *		insert_tests()
 {
 	std::cout << std::endl << "MAP TESTS" << std::endl;
@@ -87,6 +92,7 @@ void	map_tests()
 {
 	ft::map<int, std::string> * test = insert_tests();
 	at_count_tests(test);
+	erase_tests(test);
 	// std::cout << test.max_size() << std::endl;
 	// std::cout << test2.max_size() << std::endl;
 }

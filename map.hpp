@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/22 12:07:08 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/26 17:22:08 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,14 +203,22 @@ class map
 				first++;
 			}
 		}
-		// void erase(iterator pos)
-		// {
-		// 	element<value_type> *	end_elem = _end();
-		// 	if (_end() != _root)
-		// 		_end()->get_parent()->set_child(0, RIGHT);
-			
-		// 	_size--;
-		// }
+		void erase(iterator pos)
+		{
+			element<value_type> *	end_elem = _end();
+			if (_end() != _root)
+				_end()->get_parent()->set_child(0, RIGHT);
+			if (_size > 1)
+				_delete(pos);
+			else
+			{
+				_root = 0;
+				// dealloc node
+			}
+			end_elem->set_parent(_end());
+			_end()->set_child(end_elem, RIGHT);
+			_size--;
+		}
 		void erase(iterator first, iterator last);
 		size_type erase(const key_type& key);
 		void swap(map& rhs)
@@ -457,33 +465,99 @@ class map
 			}
 		}
 
-		// iterator	_delete(iterator pos) //returns replacement node
-		// {
-		// 	if (!pos->get_child(RIGHT))
-		// 	{
-		// 		pos->get_parent->set_child(pos->get_child(LEFT), pos->get_side())
-		// 		if (pos->get_child(LEFT))
-		// 			pos->get_child(LEFT)->set_parent(pos->get_parent())
-		// 	}
-		// 	else if (!pos->get_child(RIGHT))
-		// 	{
-		// 		pos->get_parent->set_child(pos->get_child(RIGHT), pos->get_side())
-		// 		if (pos->get_child(RIGHT))
-		// 			pos->get_child(RIGHT)->set_parent(pos->get_parent())
-		// 	}
-		// 	else
-		// 	{
-		// 		iterator tmp = pos;
-				
-		// 		pos++;
-		// 		pos->get_parent->set_child(0, pos->get_side());
-		// 		pos->set_parent(tmp->get_parent());
-		// 		tmp->get_parent->set_child(pos, tmp->get_side());
-		// 		pos->set_child(tmp->get_child(LEFT), LEFT);
+		bool		_pre_correct(bool del_color, iterator rep)
+		{
+			if (del_color == RED && (rep->get_color() == RED || !rep))
+					return 0;
+			else if (del_color == RED && rep->get_color() == BLACK)
+			{
+				rep->set_color(RED);
+				return 1;
+			}
+			else if (del_color == BLACK && rep->get_color() == RED)
+			{
+				rep->set_color(BLACK);
+				return 0;
+			}
+			else
+				return 1;
+		}
 
-		// 	}
-			
-		// }
+		iterator	_correct(bool del_color, pointer rep, pointer x)
+		{
+			pointer w;
+
+			if (_pre_correct(del_color, rep))
+			{
+				while (x->get_color() == BLACK)
+				{
+					w = x->get_brother();
+					if (w->get_color() == RED)
+					{
+						w->set_color(BLACK);
+						x->get_parent()->set_color(RED);
+						_rotate(x->get_parent(), x->get_side());
+					}
+					else if (w->get_child(x->get_side())->get_color() == BLACK && w->get_child(!(x->get_side()))->get_color() == BLACK)
+					{
+						w->set_color(RED);
+						x = x->get_parent();
+					}
+					else 
+					{
+						if (w->get_child(x->get_side())->get_color() == RED && w->get_child(!(x->get_side()))->get_color() == BLACK)
+						{
+							w->get_child(x->get_side())->set_color(BLACK);
+							w->set_color(RED);
+							_rotate(w, !(x->get_side()));
+						}
+						w->set_color(x->get_parent()->get_color());
+						x->get_parent()->set_color(BLACK);
+						w->get_child(!(x->get_side()))->set_color(BLACK);
+						_rotate(x->get_parent(), x->get_side());
+						return iterator(rep);
+					}
+				}
+				x->set_color(BLACK);
+			}
+			return iterator(rep);
+		}
+
+		iterator	_delete(iterator pos) //returns replacement node
+		{
+			pointer x;
+			pointer del_node = *pos;
+
+			if (!del_node->get_child(RIGHT))
+			{
+				del_node->get_parent->set_child(del_node->get_child(LEFT), del_node->get_side());
+				if (del_node->get_child(LEFT))
+					del_node->get_child(LEFT)->set_parent(del_node->get_parent());
+				return(_correct(del_node->get_color(), del_node->get_child(LEFT), del_node->get_child(LEFT)));
+			}
+			else if (!del_node->get_child(LEFT))
+			{
+				del_node->get_parent->set_child(del_node->get_child(RIGHT), del_node->get_side());
+				if (del_node->get_child(RIGHT))
+					del_node->get_child(RIGHT)->set_parent(del_node->get_parent());
+				return(_correct(del_node->get_color(), del_node->get_child(RIGHT), del_node->get_child(RIGHT)));
+			}
+			else
+			{
+				pos++;
+				pointer tmp = *pos;
+
+				x = tmp->get_child(RIGHT);
+				tmp->get_parent->set_child(tmp->get_child(RIGHT), tmp->get_side());
+				tmp->set_parent(del_node->get_parent());
+				del_node->get_parent->set_child(tmp, del_node->get_side());
+				tmp->set_child(del_node->get_child(LEFT), LEFT);
+				tmp->get_child(LEFT)->set_parent(tmp);
+				tmp->set_child(del_node->get_child(RIGHT), RIGHT);
+				tmp->get_child(LEFT)->set_parent(tmp);
+				return(_correct(del_node->get_color(), tmp, x));
+			}
+		}
 };
 
 template<class Key, class T, class Compare, class Alloc>
