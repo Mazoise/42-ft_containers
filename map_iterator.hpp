@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/26 17:22:18 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/27 15:54:16 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,14 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 		typedef bidirectional_iterator_tag			iterator_category;
 
 		map_iterator(void) : _elem(0) {}
-		map_iterator(element<value_type> & elem) : _elem(&elem) {}
+		// map_iterator(element<value_type> & elem) : _elem(&elem) {}
 		map_iterator(element<value_type> * elem) : _elem(elem) {}
 		map_iterator(const map_iterator& rhs) : _elem(rhs._elem) {}
 		virtual ~map_iterator(void) {}
 
-		operator map_iterator<const T>()
+		operator map_iterator<const T>() const
 		{
-			return map_iterator<const T>(*_elem);
+			return map_iterator<const T>(_elem);
 		}
 
 		map_iterator&		operator=(element<value_type> * rhs)
@@ -94,7 +94,7 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 
 		element<value_type> * _elem;
 
-		element<value_type> *	_neighbor(bool dir)
+		element<value_type> *	_neighbor(bool dir) const
 		{
 			element<value_type> * tmp = _elem;
 			if (tmp->get_child(dir))

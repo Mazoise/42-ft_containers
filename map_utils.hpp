@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 11:31:05 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/22 12:02:05 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/27 15:54:43 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,13 @@ class	element
 
 				typedef T		value_type;
 				typedef T*		pointer;
-
+		
 				element() : _value(0), _parent(0), _color(RED)
 				{
 					_child[LEFT] = 0;
 					_child[RIGHT] = 0;
 				}
-				element(value_type * value) : _value(value), _parent(0), _color(RED)
+				element(pointer value) : _value(value), _parent(0), _color(RED)
 				{
 					_child[LEFT] = 0;
 					_child[RIGHT] = 0;
@@ -53,30 +53,30 @@ class	element
 					_color = rhs._color;
 					return *this;
 				}
-				element *get_child(bool dir) { return _child[dir]; }
-				element *get_parent() { return _parent; }
-				element *get_grand_parent()
+				element *get_child(bool dir) const { return _child[dir]; }
+				element *get_parent() const { return _parent; }
+				element *get_grand_parent() const
 				{
 					if (_parent)
 						return (_parent->get_parent());
 					return (0);
 				}
-				element *get_brother()
+				element *get_brother() const
 				{
 					if (!_parent)
 						return (0);
 					return (_parent->get_child(!get_side()));
 				}
-				element *get_uncle()
+				element *get_uncle() const
 				{
 					element * tmp = get_parent();
 					if (!tmp)
 						return (0);
 					return (tmp->get_brother());
 				}
-				pointer get_value() { return _value; }
-				bool	get_color() { return _color; }
-				bool	get_side()
+				pointer get_value() const { return _value; }
+				bool	get_color() const { return _color; }
+				bool	get_side() const
 				{
 					if (!_parent)
 						return (0);

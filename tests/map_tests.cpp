@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/12 15:56:14 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/27 14:02:35 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/27 15:49:19 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@ template <class key, class value>
 void	print_map( ft::map<key, value> &test)
 {
 	size_t i = 0;
-	typename  ft::map<key, value>::iterator		beg = test.begin();
-	typename  ft::map<key, value>::iterator		end = test.end();
+	typename  ft::map<key, value>::const_iterator		beg = test.begin();
+	typename  ft::map<key, value>::const_iterator		end = test.end();
 	std::cout << "size : " << test.size() << std::endl;
-	for (typename  ft::map<key, value>::iterator it = beg; it != end; it++)
+	for (typename  ft::map<key, value>::const_iterator it = beg; it != end; it++)
 	{
 		std::cout << "\"" << it->first << "\" : " << it->second;
 		if (i % 5 == 4 || i == test.size() - 1)
