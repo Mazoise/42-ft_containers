@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/26 17:22:08 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/27 11:45:07 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,7 @@ class map
 			if (_end() != _root)
 				_end()->get_parent()->set_child(0, RIGHT);
 			if (_size > 1)
-				_delete(pos);
+				_delete(pos, _find(pos->first));
 			else
 			{
 				_root = 0;
@@ -219,8 +219,38 @@ class map
 			_end()->set_child(end_elem, RIGHT);
 			_size--;
 		}
-		void erase(iterator first, iterator last);
-		size_type erase(const key_type& key);
+		void erase(iterator first, iterator last)
+		{
+			iterator next;
+			iterator now;
+			while (next != last)
+			{
+				now = first;
+				next = ++first;
+				erase(now);
+			}
+		}
+		size_type erase(const key_type& key)
+		{
+			element<value_type> *	end_elem = _end();
+			element<value_type> *	del_elem = _find(key);
+			
+			if (_end() != _root)
+				_end()->get_parent()->set_child(0, RIGHT);
+			if (!del_elem)
+				return 0;
+			if (_size > 1)
+				_delete(iterator(del_elem), del_elem);
+			else
+			{
+				_root = 0;
+				// dealloc node
+			}
+			end_elem->set_parent(_end());
+			_end()->set_child(end_elem, RIGHT);
+			_size--;
+			return 1;
+		}
 		void swap(map& rhs)
 		{
 			element<value_type> *	tmp_root;
@@ -465,16 +495,16 @@ class map
 			}
 		}
 
-		bool		_pre_correct(bool del_color, iterator rep)
+		bool		_pre_correct(bool del_color, element<value_type> * rep)
 		{
-			if (del_color == RED && (rep->get_color() == RED || !rep))
+			if (del_color == RED && (_color(rep) == RED || !rep))
 					return 0;
-			else if (del_color == RED && rep->get_color() == BLACK)
+			else if (del_color == RED && _color(rep) == BLACK)
 			{
 				rep->set_color(RED);
 				return 1;
 			}
-			else if (del_color == BLACK && rep->get_color() == RED)
+			else if (del_color == BLACK && _color(rep) == RED)
 			{
 				rep->set_color(BLACK);
 				return 0;
@@ -483,80 +513,152 @@ class map
 				return 1;
 		}
 
-		iterator	_correct(bool del_color, pointer rep, pointer x)
+		void	_correct(bool del_color, element<value_type> * rep, element<value_type> * x, element<value_type> * w)
 		{
-			pointer w;
-
+			if (!rep)
+				return ;
 			if (_pre_correct(del_color, rep))
 			{
-				while (x->get_color() == BLACK)
+				if (x)
 				{
-					w = x->get_brother();
-					if (w->get_color() == RED)
+					_print_node(x);
+					std::cerr << "parent" << std::endl;
+					_print_node(x->get_parent());
+					std::cerr << "left child" << std::endl;
+					_print_node(x->get_child(LEFT));
+					std::cerr << "right child" << std::endl;
+					_print_node(x->get_child(RIGHT));
+				}
+				if (w)
+				{
+					_print_node(w);
+					std::cerr << "parent" << std::endl;
+					_print_node(w->get_parent());
+					std::cerr << "left child" << std::endl;
+					_print_node(w->get_child(LEFT));
+					std::cerr << "right child" << std::endl;
+					_print_node(w->get_child(RIGHT));
+				}
+				while (w && (!x || _color(x) == BLACK))
+				{
+					if (_color(w) == RED)
 					{
 						w->set_color(BLACK);
-						x->get_parent()->set_color(RED);
-						_rotate(x->get_parent(), x->get_side());
+						w->get_parent()->set_color(RED);
+						_rotate(w->get_parent(), !(w->get_side()));
 					}
-					else if (w->get_child(x->get_side())->get_color() == BLACK && w->get_child(!(x->get_side()))->get_color() == BLACK)
+					else if (_color(w->get_child(!(w->get_side()))) == BLACK && _color(w->get_child(w->get_side())) == BLACK)
 					{
 						w->set_color(RED);
-						x = x->get_parent();
+						x = w->get_parent();
+						w = w->get_uncle();
 					}
-					else 
+					else
 					{
-						if (w->get_child(x->get_side())->get_color() == RED && w->get_child(!(x->get_side()))->get_color() == BLACK)
+						if (_color(w->get_child(!(w->get_side()))) == RED && _color(w->get_child(w->get_side())) == BLACK)
 						{
-							w->get_child(x->get_side())->set_color(BLACK);
+							w->get_child(!(w->get_side()))->set_color(BLACK);
 							w->set_color(RED);
-							_rotate(w, !(x->get_side()));
+							_rotate(w, !(!(w->get_side())));
 						}
-						w->set_color(x->get_parent()->get_color());
-						x->get_parent()->set_color(BLACK);
-						w->get_child(!(x->get_side()))->set_color(BLACK);
-						_rotate(x->get_parent(), x->get_side());
-						return iterator(rep);
+						w->set_color(w->get_parent()->get_color());
+						w->get_parent()->set_color(BLACK);
+						w->get_child(!(!(w->get_side())))->set_color(BLACK);
+						_rotate(w->get_parent(), !(w->get_side()));
+						return ;
 					}
+					if (x)
+						w = x->get_brother();
 				}
-				x->set_color(BLACK);
+				if (x)
+					x->set_color(BLACK);
 			}
-			return iterator(rep);
 		}
 
-		iterator	_delete(iterator pos) //returns replacement node
+		bool	_color(element<value_type> * node)
 		{
-			pointer x;
-			pointer del_node = *pos;
+			if (node)
+				return (node->get_color());
+			else
+				return (BLACK);
+		}
+
+		void	_delete(iterator del_it, element<value_type> * del_node) //returns replacement node
+		{
+			element<value_type> *	x;
+			element<value_type> *	w;
 
 			if (!del_node->get_child(RIGHT))
 			{
-				del_node->get_parent->set_child(del_node->get_child(LEFT), del_node->get_side());
+				del_node->get_parent()->set_child(del_node->get_child(LEFT), del_node->get_side());
 				if (del_node->get_child(LEFT))
 					del_node->get_child(LEFT)->set_parent(del_node->get_parent());
-				return(_correct(del_node->get_color(), del_node->get_child(LEFT), del_node->get_child(LEFT)));
+				_correct(del_node->get_color(), del_node->get_child(LEFT), del_node->get_child(LEFT), del_node->get_child(RIGHT));
+				_print_node(del_node->get_child(LEFT));
+				std::cerr << "parent" << std::endl;
+				_print_node(del_node->get_child(LEFT)->get_parent());
+				std::cerr << "left child" << std::endl;
+				_print_node(del_node->get_child(LEFT)->get_child(LEFT));
+				std::cerr << "right child" << std::endl;
+				_print_node(del_node->get_child(LEFT)->get_child(RIGHT));
 			}
 			else if (!del_node->get_child(LEFT))
 			{
-				del_node->get_parent->set_child(del_node->get_child(RIGHT), del_node->get_side());
+				del_node->get_parent()->set_child(del_node->get_child(RIGHT), del_node->get_side());
 				if (del_node->get_child(RIGHT))
 					del_node->get_child(RIGHT)->set_parent(del_node->get_parent());
-				return(_correct(del_node->get_color(), del_node->get_child(RIGHT), del_node->get_child(RIGHT)));
+				_correct(del_node->get_color(), del_node->get_child(RIGHT), del_node->get_child(RIGHT), del_node->get_child(LEFT));
+				_print_node(del_node->get_child(RIGHT));
+				std::cerr << "parent" << std::endl;
+				_print_node(del_node->get_child(RIGHT)->get_parent());
+				std::cerr << "left child" << std::endl;
+				_print_node(del_node->get_child(RIGHT)->get_child(LEFT));
+				std::cerr << "right child" << std::endl;
+				_print_node(del_node->get_child(RIGHT)->get_child(RIGHT));
 			}
 			else
 			{
-				pos++;
-				pointer tmp = *pos;
+				del_it++;
+				element<value_type> *	repl_node = _find(del_it->first);
 
-				x = tmp->get_child(RIGHT);
-				tmp->get_parent->set_child(tmp->get_child(RIGHT), tmp->get_side());
-				tmp->set_parent(del_node->get_parent());
-				del_node->get_parent->set_child(tmp, del_node->get_side());
-				tmp->set_child(del_node->get_child(LEFT), LEFT);
-				tmp->get_child(LEFT)->set_parent(tmp);
-				tmp->set_child(del_node->get_child(RIGHT), RIGHT);
-				tmp->get_child(LEFT)->set_parent(tmp);
-				return(_correct(del_node->get_color(), tmp, x));
+				x = repl_node->get_child(RIGHT);
+				repl_node->get_parent()->set_child(repl_node->get_child(RIGHT), repl_node->get_side());
+				w = repl_node->get_parent()->get_child(!(repl_node->get_side()));
+				repl_node->set_parent(del_node->get_parent());
+				del_node->get_parent()->set_child(repl_node, del_node->get_side());
+				repl_node->set_child(del_node->get_child(LEFT), LEFT);
+				repl_node->get_child(LEFT)->set_parent(repl_node);
+				repl_node->set_child(del_node->get_child(RIGHT), RIGHT);
+				repl_node->get_child(RIGHT)->set_parent(repl_node);
+				_correct(del_node->get_color(), repl_node, x, w);
+				_print_node(repl_node);
+				std::cerr << "parent" << std::endl;
+				_print_node(repl_node->get_parent());
+				std::cerr << "left child" << std::endl;
+				_print_node(repl_node->get_child(LEFT));
+				std::cerr << "right child" << std::endl;
+				_print_node(repl_node->get_child(RIGHT));
 			}
+			//delete old node
+		}
+
+		void	_print_node(element<value_type> *	_elem)
+		{
+			if (!_elem)
+				return ;
+			std::cerr << "ME :" << _elem->get_value()->first << std::endl;
+			if (_elem->get_parent())
+				std::cerr << "PARENT :" << _elem->get_parent()->get_value()->first << std::endl;
+			if (_elem->get_child(LEFT))
+				std::cerr << "LEFT_CHILD :" << _elem->get_child(LEFT)->get_value()->first << std::endl;
+			if (_elem->get_child(RIGHT))
+				std::cerr << "RIGHT_CHILD :" << _elem->get_child(RIGHT)->get_value()->first << std::endl;
+			if (_elem->get_brother())
+				std::cerr << "BROTHER :" << _elem->get_brother()->get_value()->first << std::endl;
+			if (_elem->get_uncle())
+			std::cerr << "UNCLE :" << _elem->get_uncle()->get_value()->first << std::endl;
+			std::cerr << "SIDE :" << _elem->get_side() << std::endl;
+			std::cerr << std::endl;
 		}
 };
 
