@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/12 15:56:14 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/27 11:11:55 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/27 14:02:35 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ void		erase_tests(ft::map<int, std::string>	*test)
 	std::cout << "\"" << it->first << "\" : " << it->second << std::endl;
 	std::cout << "\"" << it2->first << "\" : " << it2->second << std::endl;
 	test->erase(it, it2);
+	print_map<int, std::string>(*test);
+	test->erase(test->begin(), test->end());
 	print_map<int, std::string>(*test);
 }
 
