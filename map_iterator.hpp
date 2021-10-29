@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/29 16:32:53 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/29 17:43:16 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,9 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 		bool						operator!=(const map_iterator& rhs) const
 		{ return (_elem != rhs._elem); }
 
-		reference					operator*(void) const
-		{ return _elem->get_value(); }
-		pointer					operator->(void) const
+		reference					operator*(void)
+		{ return *(_elem->get_value()); }
+		pointer					operator->(void)
 		{ return _elem->get_value(); }
 
 		map_iterator&		operator++(void)

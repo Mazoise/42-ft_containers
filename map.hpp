@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/29 17:34:11 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/29 18:14:33 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ class map
 	private :
 
 		element<value_type> *	_root;
+		element<value_type> *	_rbeg_elem;
+		element<value_type> *	_end_elem;
 		size_type				_size;
 		key_compare				_comp;
 		allocator_type			_alloc;
@@ -70,11 +72,15 @@ class map
 
 		map() : _size(0), _comp(key_compare()),_alloc(allocator_type())
 		{
-			_root = new element<value_type>(); // alloc
+			_end_elem = new element<value_type>(); // alloc
+			_rbeg_elem = new element<value_type>(); // alloc
+			_root = _end_elem;
 		}
 		explicit map(const Compare& comp, const Allocator& alloc = Allocator()) : _size(0), _comp(comp), _alloc(alloc)
 		{
-			_root = new element<value_type>(); // alloc
+			_end_elem = new element<value_type>(); // alloc
+			_rbeg_elem = new element<value_type>(); // alloc
+			_root = _end_elem;
 		}
 		template<class InputIt>
 		map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _size(0), _comp(comp),_alloc(alloc)
@@ -89,7 +95,8 @@ class map
 		~map()
 		{
 			clear();
-			delete _root;
+			delete _end_elem;
+			delete _rbeg_elem;
 		}
 		map& operator=(const map& rhs)
 		{
@@ -138,25 +145,36 @@ class map
 		}
 		iterator begin()
 		{
-			return(iterator(_begin()));
+			return iterator(_begin());
 		}
 		const_iterator begin() const
 		{
-			return(const_iterator(_begin()));
+			return const_iterator(_begin());
 		}
 		iterator end()
 		{
-			return(iterator(_end()));
+			return iterator(_end());
 		}
 		const_iterator end() const
 		{
-			return(const_iterator(_end()));
+			return const_iterator(_end());
 		}
-		// reverse_iterator rbegin();
-		// const_reverse_iterator rbegin() const;
-		// reverse_iterator rend();
-		// const_reverse_iterator rend() const;
-
+		reverse_iterator rbegin()
+		{
+			return reverse_iterator(_rbegin());
+		}
+		// const_reverse_iterator rbegin() const
+		// {
+		// 	return const_reverse_iterator(_rbegin());
+		// }
+		reverse_iterator rend() const
+		{
+			return reverse_iterator(_rend());
+		}
+		// const_reverse_iterator rend() const
+		// {
+		// 	return const_reverse_iterator(_rend());
+		// }
 		bool empty() const
 		{
 			return(!_size);
@@ -178,23 +196,29 @@ class map
 			element<value_type> * tmp = _find(value.first);
 			if (_find(value.first))
 				return (ft::make_pair(iterator(tmp), 0));
-			element<value_type> *	end_elem = _end();
-			if (_end() != _root)
-				_end()->get_parent()->set_child(0, RIGHT);
+			if (_end_elem != _root)
+			{
+				_end_elem->get_parent()->set_child(0, RIGHT);
+				_rbeg_elem->get_parent()->set_child(0, LEFT);
+			}
 			pointer new_value = _alloc.allocate(1);
 			_alloc.construct(new_value, value_type(value));
 			element<value_type> *	new_elem = new element<value_type>(new_value);
 			_simple_insert(new_elem);
 			_red_black(new_elem);
 			_size++;
-			end_elem->set_parent(_end());
-			_end()->set_child(end_elem, RIGHT);
+			_end_elem->set_parent(_end());
+			_rbeg_elem->set_parent(_rbegin());
+			_end()->set_child(_end_elem, RIGHT);
+			_rbegin()->set_child(_rbeg_elem, LEFT);
 			return (ft::make_pair(iterator(new_elem), 1));
 		}
 		iterator insert(iterator hint, const value_type& value)
 		{
 			(void)hint;
-			insert(value);
+			pair<iterator, bool> res;
+			res = insert(value);
+			return res.first;
 		}
 		template<class InputIt>
 		void insert(InputIt first, typename ft::enable_if<!isIntegral<InputIt>::value, InputIt>::type last) // add enable if 
@@ -207,22 +231,27 @@ class map
 		}
 		void erase(iterator pos)
 		{
-			element<value_type> *	end_elem = _end();
-			if (_end() != _root)
-				_end()->get_parent()->set_child(0, RIGHT);
+			if (_end_elem != _root)
+			{
+				_end_elem->get_parent()->set_child(0, RIGHT);
+				_rbeg_elem->get_parent()->set_child(0, LEFT);
+			}
 			if (_size > 1)
 			{
 				_delete(pos, _find(pos->first));
-				end_elem->set_parent(_end());
-				_end()->set_child(end_elem, RIGHT);
+				_end_elem->set_parent(_end());
+				_rbeg_elem->set_parent(_rbegin());
+				_end()->set_child(_end_elem, RIGHT);
+				_rbegin()->set_child(_rbeg_elem, LEFT);
 			}
 			else
 			{
 				_alloc.destroy(_root->get_value());
 				_alloc.deallocate(_root->get_value(), 1);
 				delete _root;
-				_root = end_elem;
-				end_elem->set_parent(0);
+				_root = _end_elem;
+				_end_elem->set_parent(0);
+				_rbeg_elem->set_parent(0);
 			}
 			_size--;
 		}
@@ -410,6 +439,20 @@ class map
 			return tmp;
 		}
 		element<value_type> *	_begin() const
+		{
+			element<value_type> * tmp = _root;
+			while(tmp->get_child(LEFT) && tmp->get_child(LEFT)->get_value())
+				tmp = tmp->get_child(LEFT);
+			return tmp;
+		}
+		element<value_type> *	_rend() const
+		{
+			element<value_type> * tmp = _root;
+			while(tmp->get_child(RIGHT) && tmp->get_child(RIGHT)->get_value())
+				tmp = tmp->get_child(RIGHT);
+			return tmp;
+		}
+		element<value_type> *	_rbegin() const
 		{
 			element<value_type> * tmp = _root;
 			while(tmp->get_child(LEFT))
