@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 11:31:05 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/27 15:54:43 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/29 15:54:59 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ class	element
 			first_type	first;
 			second_type	second;
 
-		pair() : first(first(), second(second())) {}
+		pair() : first(first_type()), second(second_type()) {}
 		pair( const T1& x, const T2& y ) : first(x), second(y) {}
 		template< class U1, class U2 >
 		pair( const pair<U1, U2>& p ) : first(p.first), second(p.second) {}
@@ -119,6 +119,7 @@ class	element
 		{
 			first = rhs.first;
 			second = rhs.second;
+			return *this;
 		}
 	};
 

@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/27 15:13:43 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/29 17:34:11 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,10 @@ class map
 		typedef const value_type&					const_reference;
 		typedef typename Allocator::pointer			pointer;
 		typedef typename Allocator::const_pointer	const_pointer;
-		typedef map_iterator<value_type>			iterator;
-		typedef map_iterator<const value_type>		const_iterator;
-		// typedef rev_map_iterator<iterator>			reverse_iterator;
-		// typedef rev_map_iterator<const_iterator>	const_reverse_iterator;
+		typedef ft::map_iterator< value_type >			iterator;
+		typedef ft::map_iterator< const value_type >	const_iterator;
+		typedef ft::reverse_iterator< iterator >		reverse_iterator;
+		typedef ft::reverse_iterator< const_iterator >	const_reverse_iterator;
 
 	private :
 

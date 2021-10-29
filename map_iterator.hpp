@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/27 15:54:16 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/29 16:32:53 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 
 		operator map_iterator<const T>() const
 		{
-			return map_iterator<const T>(_elem);
+			return map_iterator<const T>(reinterpret_cast<element<const value_type> *>(_elem));
 		}
 
 		map_iterator&		operator=(element<value_type> * rhs)
@@ -72,22 +72,22 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 			_elem = _neighbor(RIGHT);
 			return *this;
 		}
-		map_iterator		operator++(int rhs)
+		map_iterator		operator++(int)
 		{
-			(void)rhs;
-			_elem = _neighbor(RIGHT);
-			return *this;
+			map_iterator tmp = *this;
+			++(*this);
+			return (tmp);
 		}
 		map_iterator&		operator--(void)
 		{
 			_elem = _neighbor(LEFT);
 			return *this;
 		}
-		map_iterator		operator--(int rhs)
+		map_iterator		operator--(int)
 		{
-			(void)rhs;
-			_elem = _neighbor(LEFT);
-			return *this;
+			map_iterator tmp = *this;
+			--(*this);
+			return (tmp);
 		}
 
 	private :

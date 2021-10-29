@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/22 12:07:16 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/10/29 17:08:43 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,10 @@ class vector
 		typedef const value_type&									const_reference;
 		typedef typename Alloc::pointer								pointer;
 		typedef const typename Alloc::pointer						const_pointer;
-		typedef vector_iterator<value_type>							iterator;
-		typedef vector_iterator<const value_type>					const_iterator;
-		typedef rev_vector_iterator<iterator>						reverse_iterator;
-		typedef rev_vector_iterator<const_iterator>					const_reverse_iterator;
+		typedef ft::vector_iterator< value_type >						iterator;
+		typedef ft::vector_iterator< const value_type >				const_iterator;
+		typedef ft::reverse_iterator< iterator >						reverse_iterator;
+		typedef ft::reverse_iterator< const_iterator >				const_reverse_iterator;
 
 		explicit vector (const allocator_type& alloc = allocator_type())
 		: _value(0), _size(0), _capacity(0), _alloc(alloc), _old_capacity(0)
