@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/29 17:43:16 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/03 20:47:41 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,10 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 		map_iterator&		operator++(void)
 		{
 			_elem = _neighbor(RIGHT);
+			if (_elem->get_value())
+				std::cerr << "elem(++1) : " << _elem->get_value()->first << " : " << _elem->get_value()->second << std::endl;
+			else
+				std::cerr << "elem(++1) : NO VALUE " << std::endl;
 			return *this;
 		}
 		map_iterator		operator++(int)
@@ -81,6 +85,10 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 		map_iterator&		operator--(void)
 		{
 			_elem = _neighbor(LEFT);
+			if (_elem->get_value())
+				std::cerr << "elem(--1) : " << _elem->get_value()->first << " : " << _elem->get_value()->second << std::endl;
+			else
+				std::cerr << "elem(--1) : NO VALUE " << std::endl;
 			return *this;
 		}
 		map_iterator		operator--(int)
@@ -97,6 +105,12 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 		element<value_type> *	_neighbor(bool dir) const
 		{
 			element<value_type> * tmp = _elem;
+			if (!tmp)
+				return 0;
+			if (tmp->get_value())
+				std::cerr << "elem(neigh) : " << tmp->get_value()->first << " : " << tmp->get_value()->second << std::endl;
+			else
+				std::cerr << "elem(neigh) : NO VALUE " << std::endl;
 			if (tmp->get_child(dir))
 			{
 				tmp = tmp->get_child(dir);
@@ -118,7 +132,10 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 				}
 			}
 			else
+			{
+				std::cerr << "SHOULD NOT HAPPEN" << std::endl;
 				return 0;
+			}
 		}
 };
 

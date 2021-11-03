@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/29 17:08:43 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/03 20:17:05 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ class vector
 				{
 					_alloc.destroy(&_value[i]);
 				}
-				_alloc.deallocate(_value, _capacity);
+				_alloc.deallocate(&_value[-1], _capacity + 2);
 			}
 		}
 
@@ -87,13 +87,13 @@ class vector
 		const_iterator end (void) const
 		{ return const_iterator(_value[_size]); }
 		reverse_iterator rbegin (void)
-		{ return reverse_iterator(_value[_size - 1]); }
+		{ return reverse_iterator(end()); }
 		const_reverse_iterator rbegin (void) const
-		{ return const_reverse_iterator(_value[_size - 1]); }
+		{ return const_reverse_iterator(end()); }
 		reverse_iterator rend (void)
-		{ return reverse_iterator(_value[-1]); }
+		{ return reverse_iterator(begin()); }
 		const_reverse_iterator rend (void) const
-		{ return const_reverse_iterator(_value[-1]); }
+		{ return const_reverse_iterator(begin()); }
 
 		size_type size (void) const
 		{ return _size; }
@@ -120,7 +120,7 @@ class vector
 				throw (std::length_error("vector::reserve"));
 			if (n > _capacity)
 			{
-				pointer		tmp = _alloc.allocate(n);
+				pointer		tmp = &_alloc.allocate(n + 2)[1];
 
 				if (_capacity)
 				{
@@ -128,7 +128,7 @@ class vector
 						_alloc.construct(&tmp[i], _value[i]);
 					for (size_type i = 0; i < _size; i++)
 						_alloc.destroy(&_value[i]);
-					_alloc.deallocate(_value, _capacity);
+					_alloc.deallocate(&_value[-1], _capacity + 2);
 				}
 				_value = tmp;
 				_capacity = n;
@@ -284,7 +284,7 @@ class vector
 			if (n > _capacity)
 			{
 				_save_old();
-				_value = _alloc.allocate(n);
+				_value = &_alloc.allocate(n + 2)[1];
 
 				if (_capacity)
 				{
@@ -312,7 +312,7 @@ class vector
 					_alloc.destroy(&_old_value[i]);
 				}
 				if (_old_capacity < _capacity)
-					_alloc.deallocate(_old_value, _old_capacity);
+					_alloc.deallocate(&_old_value[-1], _old_capacity + 2);
 				_old_capacity = 0;
 			}
 		}
@@ -353,7 +353,7 @@ bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
 	if (lhs.size() != rhs.size())
 		return false;
-	return (equal(lhs.begin(), lhs.end(), rhs.begin()));
+	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 }
 
 template <class T, class Alloc>
@@ -365,7 +365,7 @@ bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 template <class T, class Alloc>
 bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 {
-	return (lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+	return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 }
 
 template <class T, class Alloc>

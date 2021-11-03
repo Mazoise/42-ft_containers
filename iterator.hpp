@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 16:13:26 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/29 17:33:11 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/03 17:16:03 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ class reverse_iterator
 		template< class U >
 		reverse_iterator& operator=( const reverse_iterator<U>& rhs)
 		{
-			current = rhs.current;
+			current = rhs.base();
 			return *this;
 		}
 		iterator_type base() const

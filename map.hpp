@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/29 18:14:33 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/04 00:24:06 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ class map
 			_root = _end_elem;
 		}
 		template<class InputIt>
-		map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _size(0), _comp(comp),_alloc(alloc)
+		map(InputIt first, typename ft::enable_if<!isIntegral<InputIt>::value, InputIt>::type last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _size(0), _comp(comp),_alloc(alloc)
 		{
 			clear();
 			insert(first, last);
@@ -149,7 +149,7 @@ class map
 		}
 		const_iterator begin() const
 		{
-			return const_iterator(_begin());
+			return const_iterator(begin());
 		}
 		iterator end()
 		{
@@ -157,24 +157,24 @@ class map
 		}
 		const_iterator end() const
 		{
-			return const_iterator(_end());
+			return const_iterator(end());
 		}
 		reverse_iterator rbegin()
 		{
-			return reverse_iterator(_rbegin());
+			return reverse_iterator(_end());
 		}
-		// const_reverse_iterator rbegin() const
-		// {
-		// 	return const_reverse_iterator(_rbegin());
-		// }
-		reverse_iterator rend() const
+		const_reverse_iterator rbegin() const
 		{
-			return reverse_iterator(_rend());
+			return const_reverse_iterator(rbegin());
 		}
-		// const_reverse_iterator rend() const
-		// {
-		// 	return const_reverse_iterator(_rend());
-		// }
+		reverse_iterator rend()
+		{
+			return reverse_iterator(_begin());
+		}
+		const_reverse_iterator rend() const
+		{
+			return const_reverse_iterator(rend());
+		}
 		bool empty() const
 		{
 			return(!_size);
@@ -231,6 +231,7 @@ class map
 		}
 		void erase(iterator pos)
 		{
+			std::cerr << "DEB erase pos" << std::endl;
 			if (_end_elem != _root)
 			{
 				_end_elem->get_parent()->set_child(0, RIGHT);
@@ -253,24 +254,30 @@ class map
 				_end_elem->set_parent(0);
 				_rbeg_elem->set_parent(0);
 			}
+			std::cerr << "END erase pos" << std::endl;
 			_size--;
 		}
 		void erase(iterator first, iterator last)
 		{
+			std::cerr << "erase range : now = " << first->first << " : " << first->second << std::endl;
 			iterator next = first;
 			iterator now;
+			std::cerr << "DEB erase range" << std::endl;
 			while (next != last)
 			{
 				now = first;
-				next = ++first;
+				++first;
+				next = first;
 				erase(now);
 			}
+			std::cerr << "END erase range" << std::endl;
 		}
 		size_type erase(const key_type& key)
 		{
 			element<value_type> *	end_elem = _end();
 			element<value_type> *	del_elem = _find(key);
 
+			std::cerr << "DEB erase key" << std::endl;
 			if (!del_elem)
 				return 0;
 			if (_end() != _root)
@@ -290,6 +297,7 @@ class map
 				end_elem->set_parent(0);
 			}
 			_size--;
+			std::cerr << "FIN erase key" << std::endl;
 			return 1;
 		}
 		void swap(map& rhs)
@@ -600,14 +608,14 @@ class map
 				{
 					if (_color(w) == RED)
 					{
-						// std::cerr << "W is red" << std::endl;
+						std::cerr << "W is red" << std::endl;
 						w->set_color(BLACK);
 						w->get_parent()->set_color(RED);
 						_rotate(w->get_parent(), !(w->get_side()));
 					}
 					else if (_color(w->get_child(!(w->get_side()))) == BLACK && _color(w->get_child(w->get_side())) == BLACK)
 					{
-						// std::cerr << "W children black - black" << std::endl;
+						std::cerr << "W children black - black" << std::endl;
 						w->set_color(RED);
 						x = w->get_parent();
 						w = w->get_uncle();
@@ -616,14 +624,17 @@ class map
 					{
 						if (_color(w->get_child(!(w->get_side()))) == RED && _color(w->get_child(w->get_side())) == BLACK)
 						{
-							// std::cerr << "W children red - black" << std::endl;
+							std::cerr << "W children red - black" << std::endl;
 							w->get_child(!(w->get_side()))->set_color(BLACK);
 							w->set_color(RED);
 							_rotate(w, w->get_side());
 						}
-						// std::cerr << "W children black - red or red - red" << std::endl;
-						w->set_color(w->get_parent()->get_color());
-						w->get_parent()->set_color(BLACK);
+						std::cerr << "W children black - red or red - red" << std::endl;
+						if (w->get_parent())
+						{
+							w->set_color(w->get_parent()->get_color());
+							w->get_parent()->set_color(BLACK);
+						}
 						if (w->get_child(w->get_side()))
 							w->get_child(w->get_side())->set_color(BLACK);
 						_rotate(w->get_parent(), !(w->get_side()));
@@ -653,7 +664,7 @@ class map
 
 			if (!del_node->get_child(RIGHT))
 			{
-				// std::cerr << "No right child" << std::endl;
+				std::cerr << "No right child" << std::endl;
 				if (del_node->get_parent())
 					del_node->get_parent()->set_child(del_node->get_child(LEFT), del_node->get_side());
 				else
@@ -676,7 +687,7 @@ class map
 			}
 			else if (!del_node->get_child(LEFT))
 			{
-				// std::cerr << "No left child" << std::endl;
+				std::cerr << "No left child" << std::endl;
 				// _print_node(del_node);
 				if (del_node->get_parent())
 					del_node->get_parent()->set_child(del_node->get_child(RIGHT), del_node->get_side());
@@ -699,15 +710,16 @@ class map
 			}
 			else
 			{
-				// std::cerr << "2 children" << std::endl;
+				std::cerr << "2 children" << std::endl;
 				del_it++;
 				element<value_type> *	repl_node = _find(del_it->first);
-
 				x = repl_node->get_child(RIGHT);
 				repl_node->get_parent()->set_child(repl_node->get_child(RIGHT), repl_node->get_side());
 				w = repl_node->get_parent()->get_child(!(repl_node->get_side()));
 				repl_node->set_parent(del_node->get_parent());
-				del_node->get_parent()->set_child(repl_node, del_node->get_side());
+				del_node->get_side();
+				if (del_node->get_parent())
+					del_node->get_parent()->set_child(repl_node, del_node->get_side());
 				repl_node->set_child(del_node->get_child(LEFT), LEFT);
 				if (repl_node->get_child(LEFT))
 					repl_node->get_child(LEFT)->set_parent(repl_node);
@@ -724,9 +736,11 @@ class map
 				// _print_node(repl_node->get_child(RIGHT));
 				// std::cerr << std::endl;
 			}
+				std::cerr << "BIJOUR" << std::endl;
 			_alloc.destroy(del_node->get_value());
 			_alloc.deallocate(del_node->get_value(), 1);
 			delete del_node;
+				std::cerr << "BIJOUR" << std::endl;
 		}
 
 		void	_print_node(element<value_type> *	_elem)
@@ -754,7 +768,7 @@ bool operator==(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,All
 {
 	if (lhs.size() != rhs.size())
 		return false;
-	return (equal(lhs.begin(), lhs.end(), rhs.begin()));
+	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 }
 
 template<class Key, class T, class Compare, class Alloc>
@@ -766,7 +780,7 @@ bool operator!=(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,All
 template<class Key, class T, class Compare, class Alloc>
 bool operator<(const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Alloc>& rhs)
 {
-	return (lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+	return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 }
 
 template<class Key, class T, class Compare, class Alloc>
