@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/12 15:56:14 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/04 18:35:59 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/04 22:07:00 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,21 @@ void	print_map( ft::map<key, value> &test)
 	size_t i = 0;
 	typename  ft::map<key, value>::const_iterator		beg = test.begin();
 	typename  ft::map<key, value>::const_iterator		end = test.end();
+	// typename  ft::map<key, value>::reverse_iterator		rbeg = test.rbegin();
+	// typename  ft::map<key, value>::reverse_iterator		rend = test.rend();
 	std::cout << "size : " << test.size() << std::endl;
 	for (typename  ft::map<key, value>::const_iterator it = beg; it != end; it++)
+	{
+		std::cout << "\"" << it->first << "\" : " << it->second;
+		if (i % 5 == 4 || i == test.size() - 1)
+			std::cout << std::endl;
+		else
+			std::cout << " - ";
+		i++;
+	}
+	beg--;
+	end--;
+	for (typename  ft::map<key, value>::const_iterator it = end; it != beg; it--)
 	{
 		std::cout << "\"" << it->first << "\" : " << it->second;
 		if (i % 5 == 4 || i == test.size() - 1)
@@ -81,8 +94,8 @@ ft::map<int, std::string> *		insert_tests()
 	std::cout << std::endl << "MAP TESTS" << std::endl;
 	ft::map<std::string, int> test;
 	test.insert(ft::make_pair<std::string, int>("Hello", 42));
-	std::cout << std::endl << "MAP TESTS" << std::endl;
 	print_map<std::string, int>(test);
+	std::cout << std::endl << "MAP TESTS" << std::endl;
 	ft::map<int, std::string> *test2 = new ft::map<int, std::string>();
 	test2->insert(ft::make_pair<int, std::string>(42, "Hello"));
 	print_map<int, std::string>(*test2);

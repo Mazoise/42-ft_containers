@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/04 18:31:19 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/04 22:40:50 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,7 +248,7 @@ class map
 		{
 			element<value_type> *	del_elem = _find(key);
 
-			std::cerr << "DEB erase key" << std::endl;
+			std::cerr << "DEB erase key " << key << std::endl;
 			if (!del_elem)
 				return 0;
 			if (_size > 1)
@@ -443,7 +443,6 @@ class map
 				dir = key_compare()(tmp->get_value()->first, key);
 				tmp = tmp->get_child(dir);
 			}
-			std::cerr << "BIJOUR" << std::endl;
 			return 0;
 		}
 		
@@ -531,80 +530,67 @@ class map
 			}
 		}
 
-		bool		_pre_correct(bool del_color, element<value_type> * rep, element<value_type> * x)
+		void	_correct(element<value_type> * x)
 		{
-			if (del_color == RED && (rep->get_color() == RED || !rep->get_value()))
-				return 0;
-			else if (del_color == RED && rep->get_color() == BLACK)
+			element<value_type> * w;
+
+			while (x != _root && x->get_color() == BLACK)
 			{
-				rep->set_color(RED);
-				return 1;
+				w = x->get_brother();
+				if (w->get_color() == RED)
+				{
+					std::cerr << "W is red" << std::endl;
+					w->set_color(BLACK);
+					x->get_parent()->set_color(RED);
+					_rotate(x->get_parent(), x->get_side());
+					std::cerr << "Bijour" << std::endl;
+				}
+				else if (w->get_value() && w->get_child(x->get_side())->get_color() == BLACK && w->get_child(w->get_side())->get_color() == BLACK)
+				{
+					std::cerr << "W children black - black" << std::endl;
+					w->set_color(RED);
+					x = x->get_parent();
+				}
+				else
+				{
+					if (w->get_value() && w->get_child(w->get_side())->get_color() == BLACK)
+					{
+						std::cerr << "W children red - black" << std::endl;
+						w->get_child(x->get_side())->set_color(BLACK);
+						w->set_color(RED);
+						_rotate(w, w->get_side());
+						w = x->get_brother();
+					}
+					std::cerr << "W children black - red or red - red" << std::endl;
+					w->set_color(x->get_parent()->get_color());
+					x->get_parent()->set_color(BLACK);
+					if (w->get_value())
+						w->get_child(w->get_side())->set_color(BLACK);
+					_rotate(x->get_parent(), x->get_side());
+					x = _root;
+				}
+				w = x->get_brother();
 			}
-			else if (del_color == BLACK && rep->get_color() == RED)
-			{
-				rep->set_color(BLACK);
-				return 0;
-			}
-			else if (x == _root)
-				return 0;
-			else
-				return 1;
-			
+			x->set_color(BLACK);
 		}
 
-		void	_correct(bool del_color, element<value_type> * rep, element<value_type> * x)
+		void	_transplant(element<value_type> *del_elem, element<value_type> * rep_elem)
 		{
-			// std::cerr << "Correct Fonction" << std::endl;
-			if (_pre_correct(del_color, rep, x))
-			{
-				element<value_type> * w;
-				std::cerr << "pre_correct passed" << std::endl;
-				while (x != _root && x->get_color() == BLACK)
-				{
-					w = x->get_brother();
-					if (w->get_color() == RED)
-					{
-						std::cerr << "W is red" << std::endl;
-						w->set_color(BLACK);
-						x->get_parent()->set_color(RED);
-						_rotate(x->get_parent(), x->get_side());
-						std::cerr << "Bijour" << std::endl;
-					}
-					else if (w->get_value() && w->get_child(x->get_side())->get_color() == BLACK && w->get_child(w->get_side())->get_color() == BLACK)
-					{
-						std::cerr << "W children black - black" << std::endl;
-						w->set_color(RED);
-						x = x->get_parent();
-					}
-					else
-					{
-						if (w->get_value() && w->get_child(w->get_side())->get_color() == BLACK)
-						{
-							std::cerr << "W children red - black" << std::endl;
-							w->get_child(x->get_side())->set_color(BLACK);
-							w->set_color(RED);
-							_rotate(w, w->get_side());
-						}
-						std::cerr << "W children black - red or red - red" << std::endl;
-						w->set_color(x->get_parent()->get_color());
-						x->get_parent()->set_color(BLACK);
-						if (w->get_value())
-							w->get_child(w->get_side())->set_color(BLACK);
-						_rotate(x->get_parent(), x->get_side());
-						x = _root;
-					}
-					w = x->get_brother();
-				}
-				x->set_color(BLACK);
-			}
-			// std::cerr << "end correct" << std::endl;
+			if (!del_elem->get_parent())
+				_root = rep_elem;
+			else
+				del_elem->get_parent()->set_child(rep_elem, del_elem->get_side());
+			rep_elem->set_parent(del_elem->get_parent());
 		}
 
 		void	_delete(iterator del_it, element<value_type> * del_node) //returns replacement node
 		{
 			element<value_type> *	x;
 			bool					dir;
-			
+			if (!del_node)
+				std::cerr << "SNH no del node" << std::endl;
+			bool					y_original_color = del_node->get_color();
+
 			if (!del_node->get_child(RIGHT)->get_value() || !del_node->get_child(LEFT)->get_value())
 			{
 				std::cerr << "Not 2 children" << std::endl;
@@ -612,51 +598,43 @@ class map
 					dir = LEFT;
 				else
 					dir = RIGHT;
-				std::cerr << "TEST1" << std::endl;
 				x = del_node->get_child(dir);
-				if (del_node->get_parent())
-				{
-					del_node->get_parent()->set_child(x, del_node->get_side());
-					del_node->set_child(0, dir);
-				}
-				else
-					_root = x;
-				std::cerr << "TEST2" << std::endl;
-				x->set_parent(del_node->get_parent());
-				_correct(del_node->get_color(), x, x);
-				std::cerr << "TEST3" << std::endl;
+				_transplant(del_node, x);
+				del_node->set_child(0, dir);
 			}
 			else
 			{
 				std::cerr << "2 children" << std::endl;
 				del_it++;
 				element<value_type> *	repl_node = _find(del_it->first);
+				y_original_color = repl_node->get_color();
 				x = repl_node->get_child(RIGHT);
-				repl_node->get_parent()->set_child(repl_node->get_child(RIGHT), repl_node->get_side());
-				repl_node->set_parent(del_node->get_parent());
-				if (del_node->get_parent())
-					del_node->get_parent()->set_child(repl_node, del_node->get_side());
+				if (repl_node->get_parent() == del_node)
+					x->set_parent(repl_node);
+				else
+				{
+					_transplant(repl_node, x); // rejoindre le gosses du repl_node dans la chaine a sa place
+					repl_node->set_child(0, RIGHT);
+					// _print_node(repl_node);
+					repl_node->set_child(del_node->get_child(RIGHT), RIGHT);
+					repl_node->get_child(RIGHT)->set_parent(repl_node);
+					del_node->set_child(0, RIGHT);
+				}
+				_transplant(del_node, repl_node);
+				if (repl_node->get_child(LEFT) && !repl_node->get_child(LEFT)->get_value())
+					delete repl_node->get_child(LEFT);
 				repl_node->set_child(del_node->get_child(LEFT), LEFT);
 				repl_node->get_child(LEFT)->set_parent(repl_node);
-				repl_node->set_child(del_node->get_child(RIGHT), RIGHT);
-				repl_node->get_child(RIGHT)->set_parent(repl_node);
-				_correct(del_node->get_color(), repl_node, x);
-			}
-			if (_root)
-			{
-				std::cerr << "ROOT" << std::endl;
-				_print_node(_root);
-				std::cerr << "parent" << std::endl;
-				_print_node(_root->get_parent());
-				std::cerr << "left child" << std::endl;
-				_print_node(_root->get_child(LEFT));
-				std::cerr << "right child" << std::endl;
-				_print_node(_root->get_child(RIGHT));
-				std::cerr << std::endl;
+				del_node->set_child(0, LEFT);
+				repl_node->set_color(del_node->get_color());
 			}
 			_alloc.destroy(del_node->get_value());
 			_alloc.deallocate(del_node->get_value(), 1);
 			delete del_node;
+			if (y_original_color == BLACK)
+				_correct(x);
+			// for (iterator it = begin(); it != end(); it++)
+			// 	_print_node(_find(it->first));
 		}
 
 		void	_print_node(element<value_type> *	_elem)
