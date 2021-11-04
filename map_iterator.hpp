@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/03 20:47:41 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/04 13:13:51 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,10 +111,10 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 				std::cerr << "elem(neigh) : " << tmp->get_value()->first << " : " << tmp->get_value()->second << std::endl;
 			else
 				std::cerr << "elem(neigh) : NO VALUE " << std::endl;
-			if (tmp->get_child(dir))
+			if (tmp->get_child(dir) && tmp->get_child(dir)->get_value())
 			{
 				tmp = tmp->get_child(dir);
-				while (tmp->get_child(!dir))
+				while (tmp->get_child(!dir) && tmp->get_child(!dir)->get_value())
 					tmp = tmp->get_child(!dir);
 				return tmp;
 			}
@@ -127,15 +127,12 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 					while (tmp->get_parent() && tmp->get_side() == dir)
 						tmp = tmp->get_parent();
 					if (!tmp->get_parent())
-						return(tmp->get_child(dir));
+						return(_elem->get_child(dir));
 					return(tmp->get_parent());
 				}
 			}
 			else
-			{
-				std::cerr << "SHOULD NOT HAPPEN" << std::endl;
-				return 0;
-			}
+				return _elem->get_child(dir);
 		}
 };
 

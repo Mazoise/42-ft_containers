@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/04 00:24:06 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/04 18:31:19 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,6 @@ class map
 	private :
 
 		element<value_type> *	_root;
-		element<value_type> *	_rbeg_elem;
-		element<value_type> *	_end_elem;
 		size_type				_size;
 		key_compare				_comp;
 		allocator_type			_alloc;
@@ -72,15 +70,11 @@ class map
 
 		map() : _size(0), _comp(key_compare()),_alloc(allocator_type())
 		{
-			_end_elem = new element<value_type>(); // alloc
-			_rbeg_elem = new element<value_type>(); // alloc
-			_root = _end_elem;
+			_root = new element<value_type>();
 		}
 		explicit map(const Compare& comp, const Allocator& alloc = Allocator()) : _size(0), _comp(comp), _alloc(alloc)
 		{
-			_end_elem = new element<value_type>(); // alloc
-			_rbeg_elem = new element<value_type>(); // alloc
-			_root = _end_elem;
+			_root = new element<value_type>();
 		}
 		template<class InputIt>
 		map(InputIt first, typename ft::enable_if<!isIntegral<InputIt>::value, InputIt>::type last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _size(0), _comp(comp),_alloc(alloc)
@@ -95,8 +89,7 @@ class map
 		~map()
 		{
 			clear();
-			delete _end_elem;
-			delete _rbeg_elem;
+			delete _root;
 		}
 		map& operator=(const map& rhs)
 		{
@@ -194,23 +187,14 @@ class map
 		pair<iterator, bool> insert(const value_type& value)
 		{
 			element<value_type> * tmp = _find(value.first);
-			if (_find(value.first))
+			if (tmp)
 				return (ft::make_pair(iterator(tmp), 0));
-			if (_end_elem != _root)
-			{
-				_end_elem->get_parent()->set_child(0, RIGHT);
-				_rbeg_elem->get_parent()->set_child(0, LEFT);
-			}
 			pointer new_value = _alloc.allocate(1);
 			_alloc.construct(new_value, value_type(value));
 			element<value_type> *	new_elem = new element<value_type>(new_value);
 			_simple_insert(new_elem);
 			_red_black(new_elem);
 			_size++;
-			_end_elem->set_parent(_end());
-			_rbeg_elem->set_parent(_rbegin());
-			_end()->set_child(_end_elem, RIGHT);
-			_rbegin()->set_child(_rbeg_elem, LEFT);
 			return (ft::make_pair(iterator(new_elem), 1));
 		}
 		iterator insert(iterator hint, const value_type& value)
@@ -232,34 +216,22 @@ class map
 		void erase(iterator pos)
 		{
 			std::cerr << "DEB erase pos" << std::endl;
-			if (_end_elem != _root)
-			{
-				_end_elem->get_parent()->set_child(0, RIGHT);
-				_rbeg_elem->get_parent()->set_child(0, LEFT);
-			}
 			if (_size > 1)
-			{
 				_delete(pos, _find(pos->first));
-				_end_elem->set_parent(_end());
-				_rbeg_elem->set_parent(_rbegin());
-				_end()->set_child(_end_elem, RIGHT);
-				_rbegin()->set_child(_rbeg_elem, LEFT);
-			}
 			else
 			{
 				_alloc.destroy(_root->get_value());
 				_alloc.deallocate(_root->get_value(), 1);
 				delete _root;
-				_root = _end_elem;
-				_end_elem->set_parent(0);
-				_rbeg_elem->set_parent(0);
+				_root = new element<value_type>();
 			}
 			std::cerr << "END erase pos" << std::endl;
 			_size--;
 		}
 		void erase(iterator first, iterator last)
 		{
-			std::cerr << "erase range : now = " << first->first << " : " << first->second << std::endl;
+			if (first != last)
+				std::cerr << "erase range : now = " << first->first << " : " << first->second << std::endl;
 			iterator next = first;
 			iterator now;
 			std::cerr << "DEB erase range" << std::endl;
@@ -274,27 +246,19 @@ class map
 		}
 		size_type erase(const key_type& key)
 		{
-			element<value_type> *	end_elem = _end();
 			element<value_type> *	del_elem = _find(key);
 
 			std::cerr << "DEB erase key" << std::endl;
 			if (!del_elem)
 				return 0;
-			if (_end() != _root)
-				_end()->get_parent()->set_child(0, RIGHT);
 			if (_size > 1)
-			{
 				_delete(iterator(del_elem), del_elem);
-				end_elem->set_parent(_end());
-				_end()->set_child(end_elem, RIGHT);
-			}
 			else
 			{
 				_alloc.destroy(_root->get_value());
 				_alloc.deallocate(_root->get_value(), 1);
 				delete _root;
-				_root = end_elem;
-				end_elem->set_parent(0);
+				_root = new element<value_type>();
 			}
 			_size--;
 			std::cerr << "FIN erase key" << std::endl;
@@ -361,7 +325,7 @@ class map
 				if (tmp->get_value()->first == key)
 					return (iterator(tmp));
 				dir = key_compare()(tmp->get_value()->first, key);
-				if (tmp->get_child(dir))
+				if (tmp->get_child(dir) && tmp->get_child(dir)->get_value())
 					tmp = tmp->get_child(dir);
 				else if (dir == RIGHT)
 					return(iterator(tmp));
@@ -380,7 +344,7 @@ class map
 				if (tmp->get_value()->first == key)
 					return (const_iterator(tmp));
 				dir = key_compare()(tmp->get_value()->first, key);
-				if (tmp->get_child(dir))
+				if (tmp->get_child(dir) && tmp->get_child(dir)->get_value())
 					tmp = tmp->get_child(dir);
 				else if (dir == RIGHT)
 					return(const_iterator(tmp));
@@ -399,7 +363,7 @@ class map
 				if (tmp->get_value()->first == key)
 					return (++iterator(tmp));
 				dir = key_compare()(tmp->get_value()->first, key);
-				if (tmp->get_child(dir))
+				if (tmp->get_child(dir) && tmp->get_child(dir)->get_value())
 					tmp = tmp->get_child(dir);
 				else if (dir == RIGHT)
 					return(iterator(tmp));
@@ -418,7 +382,7 @@ class map
 				if (tmp->get_value()->first == key)
 					return (++const_iterator(tmp));
 				dir = key_compare()(tmp->get_value()->first, key);
-				if (tmp->get_child(dir))
+				if (tmp->get_child(dir) && tmp->get_child(dir)->get_value())
 					tmp = tmp->get_child(dir);
 				else if (dir == RIGHT)
 					return(const_iterator(tmp));
@@ -479,24 +443,31 @@ class map
 				dir = key_compare()(tmp->get_value()->first, key);
 				tmp = tmp->get_child(dir);
 			}
+			std::cerr << "BIJOUR" << std::endl;
 			return 0;
 		}
 		
 		void	_rotate(element<value_type> * rhs, bool dir)
 		{
+			
+			std::cerr << "beg rotate" << std::endl;
+			if (!rhs)
+			{
+				std::cerr << "SNH" << std::endl;
+				return ;
+			}
 			element<value_type> * tmp = rhs->get_child(!dir);
-			rhs->set_child(rhs->get_child(!dir)->get_child(dir), !dir);
-			if (rhs->get_child(!dir))
-				rhs->get_child(!dir)->set_parent(rhs);
+			rhs->set_child(tmp->get_child(dir), !dir);
+			tmp->get_child(dir)->set_parent(rhs);
 			tmp->set_child(rhs, dir);
 			tmp->set_parent(rhs->get_parent());
 			if (!tmp->get_parent())
 				_root = tmp;
-			else if (rhs->get_parent()->get_child(dir) == rhs)
-				rhs->get_parent()->set_child(tmp, dir);
 			else
-				rhs->get_parent()->set_child(tmp, !dir);
+				rhs->get_parent()->set_child(tmp, rhs->get_side());
+			tmp->set_child(rhs, dir);
 			rhs->set_parent(tmp);
+			std::cerr << "end rotate" << std::endl;
 		}
 		void	_simple_insert(element<value_type> * new_elem)
 		{
@@ -505,16 +476,18 @@ class map
 
 			if (!_root->get_value())
 			{
+				delete _root;
 				_root = new_elem;
 				return ;
 			}
-			while (i)
+			while (i->get_value())
 			{
 				dir = value_compare(_comp)(*(i->get_value()), *(new_elem->get_value())); // check order
-				if (i->get_child(dir))
+				if (i->get_child(dir) && i->get_child(dir)->get_value())
 					i = i->get_child(dir);
 				else
 				{
+					delete i->get_child(dir);
 					i->set_child(new_elem, dir);
 					new_elem->set_parent(i);
 					return ;
@@ -558,155 +531,100 @@ class map
 			}
 		}
 
-		bool		_pre_correct(bool del_color, element<value_type> * rep)
+		bool		_pre_correct(bool del_color, element<value_type> * rep, element<value_type> * x)
 		{
-			if (del_color == RED && (_color(rep) == RED || !rep))
+			if (del_color == RED && (rep->get_color() == RED || !rep->get_value()))
 				return 0;
-			else if (del_color == RED && _color(rep) == BLACK)
+			else if (del_color == RED && rep->get_color() == BLACK)
 			{
 				rep->set_color(RED);
 				return 1;
 			}
-			else if (del_color == BLACK && _color(rep) == RED)
+			else if (del_color == BLACK && rep->get_color() == RED)
 			{
 				rep->set_color(BLACK);
 				return 0;
 			}
+			else if (x == _root)
+				return 0;
 			else
 				return 1;
+			
 		}
 
-		void	_correct(bool del_color, element<value_type> * rep, element<value_type> * x, element<value_type> * w)
+		void	_correct(bool del_color, element<value_type> * rep, element<value_type> * x)
 		{
 			// std::cerr << "Correct Fonction" << std::endl;
-			if (_pre_correct(del_color, rep))
+			if (_pre_correct(del_color, rep, x))
 			{
-				// std::cerr << "pre_correct passed" << std::endl;
-				// if (x)
-				// {
-				// 	_print_node(x);
-				// 	std::cerr << "parent" << std::endl;
-				// 	_print_node(x->get_parent());
-				// 	std::cerr << "left child" << std::endl;
-				// 	_print_node(x->get_child(LEFT));
-				// 	std::cerr << "right child" << std::endl;
-				// 	_print_node(x->get_child(RIGHT));
-				// 	std::cerr << std::endl;
-				// }
-				// if (w)
-				// {
-				// 	_print_node(w);
-				// 	std::cerr << "parent" << std::endl;
-				// 	_print_node(w->get_parent());
-				// 	std::cerr << "left child" << std::endl;
-				// 	_print_node(w->get_child(LEFT));
-				// 	std::cerr << "right child" << std::endl;
-				// 	_print_node(w->get_child(RIGHT));
-				// 	std::cerr << std::endl;
-				// }
-				while (w && (!x || _color(x) == BLACK))
+				element<value_type> * w;
+				std::cerr << "pre_correct passed" << std::endl;
+				while (x != _root && x->get_color() == BLACK)
 				{
-					if (_color(w) == RED)
+					w = x->get_brother();
+					if (w->get_color() == RED)
 					{
 						std::cerr << "W is red" << std::endl;
 						w->set_color(BLACK);
-						w->get_parent()->set_color(RED);
-						_rotate(w->get_parent(), !(w->get_side()));
+						x->get_parent()->set_color(RED);
+						_rotate(x->get_parent(), x->get_side());
+						std::cerr << "Bijour" << std::endl;
 					}
-					else if (_color(w->get_child(!(w->get_side()))) == BLACK && _color(w->get_child(w->get_side())) == BLACK)
+					else if (w->get_value() && w->get_child(x->get_side())->get_color() == BLACK && w->get_child(w->get_side())->get_color() == BLACK)
 					{
 						std::cerr << "W children black - black" << std::endl;
 						w->set_color(RED);
-						x = w->get_parent();
-						w = w->get_uncle();
+						x = x->get_parent();
 					}
 					else
 					{
-						if (_color(w->get_child(!(w->get_side()))) == RED && _color(w->get_child(w->get_side())) == BLACK)
+						if (w->get_value() && w->get_child(w->get_side())->get_color() == BLACK)
 						{
 							std::cerr << "W children red - black" << std::endl;
-							w->get_child(!(w->get_side()))->set_color(BLACK);
+							w->get_child(x->get_side())->set_color(BLACK);
 							w->set_color(RED);
 							_rotate(w, w->get_side());
 						}
 						std::cerr << "W children black - red or red - red" << std::endl;
-						if (w->get_parent())
-						{
-							w->set_color(w->get_parent()->get_color());
-							w->get_parent()->set_color(BLACK);
-						}
-						if (w->get_child(w->get_side()))
+						w->set_color(x->get_parent()->get_color());
+						x->get_parent()->set_color(BLACK);
+						if (w->get_value())
 							w->get_child(w->get_side())->set_color(BLACK);
-						_rotate(w->get_parent(), !(w->get_side()));
-						return ;
+						_rotate(x->get_parent(), x->get_side());
+						x = _root;
 					}
-					if (x)
-						w = x->get_brother();
+					w = x->get_brother();
 				}
-				if (x)
-					x->set_color(BLACK);
+				x->set_color(BLACK);
 			}
 			// std::cerr << "end correct" << std::endl;
-		}
-
-		bool	_color(element<value_type> * node)
-		{
-			if (node)
-				return (node->get_color());
-			else
-				return (BLACK);
 		}
 
 		void	_delete(iterator del_it, element<value_type> * del_node) //returns replacement node
 		{
 			element<value_type> *	x;
-			element<value_type> *	w;
-
-			if (!del_node->get_child(RIGHT))
+			bool					dir;
+			
+			if (!del_node->get_child(RIGHT)->get_value() || !del_node->get_child(LEFT)->get_value())
 			{
-				std::cerr << "No right child" << std::endl;
-				if (del_node->get_parent())
-					del_node->get_parent()->set_child(del_node->get_child(LEFT), del_node->get_side());
+				std::cerr << "Not 2 children" << std::endl;
+				if (!del_node->get_child(RIGHT)->get_value())
+					dir = LEFT;
 				else
-					_root = del_node->get_child(LEFT);
-				if (del_node->get_child(LEFT))
-					del_node->get_child(LEFT)->set_parent(del_node->get_parent());
-				_correct(del_node->get_color(), del_node->get_child(LEFT), del_node->get_child(LEFT), del_node->get_child(RIGHT));
-				// if (del_node->get_child(LEFT))
-				// {
-				// 	_print_node(del_node->get_child(LEFT));
-				// 	std::cerr << "parent" << std::endl;
-				// 	_print_node(del_node->get_child(LEFT)->get_parent());
-				// 	std::cerr << "left child" << std::endl;
-				// 	_print_node(del_node->get_child(LEFT)->get_child(LEFT));
-				// 	std::cerr << "right child" << std::endl;
-				// 	_print_node(del_node->get_child(LEFT)->get_child(RIGHT));
-				// 	std::cerr << std::endl;
-				// }
-				// std::cerr << "TEST" << std::endl;
-			}
-			else if (!del_node->get_child(LEFT))
-			{
-				std::cerr << "No left child" << std::endl;
-				// _print_node(del_node);
+					dir = RIGHT;
+				std::cerr << "TEST1" << std::endl;
+				x = del_node->get_child(dir);
 				if (del_node->get_parent())
-					del_node->get_parent()->set_child(del_node->get_child(RIGHT), del_node->get_side());
+				{
+					del_node->get_parent()->set_child(x, del_node->get_side());
+					del_node->set_child(0, dir);
+				}
 				else
-					_root = del_node->get_child(RIGHT);
-				if (del_node->get_child(RIGHT))
-					del_node->get_child(RIGHT)->set_parent(del_node->get_parent());
-				_correct(del_node->get_color(), del_node->get_child(RIGHT), del_node->get_child(RIGHT), del_node->get_child(LEFT));
-				// if (del_node->get_child(RIGHT))
-				// {
-				// 	_print_node(del_node->get_child(RIGHT));
-				// 	std::cerr << "parent" << std::endl;
-				// 	_print_node(del_node->get_child(RIGHT)->get_parent());
-				// 	std::cerr << "left child" << std::endl;
-				// 	_print_node(del_node->get_child(RIGHT)->get_child(LEFT));
-				// 	std::cerr << "right child" << std::endl;
-				// 	_print_node(del_node->get_child(RIGHT)->get_child(RIGHT));
-				// 	std::cerr << std::endl;
-				// }
+					_root = x;
+				std::cerr << "TEST2" << std::endl;
+				x->set_parent(del_node->get_parent());
+				_correct(del_node->get_color(), x, x);
+				std::cerr << "TEST3" << std::endl;
 			}
 			else
 			{
@@ -715,49 +633,48 @@ class map
 				element<value_type> *	repl_node = _find(del_it->first);
 				x = repl_node->get_child(RIGHT);
 				repl_node->get_parent()->set_child(repl_node->get_child(RIGHT), repl_node->get_side());
-				w = repl_node->get_parent()->get_child(!(repl_node->get_side()));
 				repl_node->set_parent(del_node->get_parent());
-				del_node->get_side();
 				if (del_node->get_parent())
 					del_node->get_parent()->set_child(repl_node, del_node->get_side());
 				repl_node->set_child(del_node->get_child(LEFT), LEFT);
-				if (repl_node->get_child(LEFT))
-					repl_node->get_child(LEFT)->set_parent(repl_node);
+				repl_node->get_child(LEFT)->set_parent(repl_node);
 				repl_node->set_child(del_node->get_child(RIGHT), RIGHT);
-				if (repl_node->get_child(RIGHT))
-					repl_node->get_child(RIGHT)->set_parent(repl_node);
-				_correct(del_node->get_color(), repl_node, x, w);
-				// _print_node(repl_node);
-				// std::cerr << "parent" << std::endl;
-				// _print_node(repl_node->get_parent());
-				// std::cerr << "left child" << std::endl;
-				// _print_node(repl_node->get_child(LEFT));
-				// std::cerr << "right child" << std::endl;
-				// _print_node(repl_node->get_child(RIGHT));
-				// std::cerr << std::endl;
+				repl_node->get_child(RIGHT)->set_parent(repl_node);
+				_correct(del_node->get_color(), repl_node, x);
 			}
-				std::cerr << "BIJOUR" << std::endl;
+			if (_root)
+			{
+				std::cerr << "ROOT" << std::endl;
+				_print_node(_root);
+				std::cerr << "parent" << std::endl;
+				_print_node(_root->get_parent());
+				std::cerr << "left child" << std::endl;
+				_print_node(_root->get_child(LEFT));
+				std::cerr << "right child" << std::endl;
+				_print_node(_root->get_child(RIGHT));
+				std::cerr << std::endl;
+			}
 			_alloc.destroy(del_node->get_value());
 			_alloc.deallocate(del_node->get_value(), 1);
 			delete del_node;
-				std::cerr << "BIJOUR" << std::endl;
 		}
 
 		void	_print_node(element<value_type> *	_elem)
 		{
 			if (!_elem)
 				return ;
+			if (_elem->get_value())
 			std::cerr << "ME :" << _elem->get_value()->first << std::endl;
 			if (_elem->get_parent())
 				std::cerr << "PARENT :" << _elem->get_parent()->get_value()->first << std::endl;
-			if (_elem->get_child(LEFT))
+			if (_elem->get_child(LEFT) && _elem->get_child(LEFT)->get_value())
 				std::cerr << "LEFT_CHILD :" << _elem->get_child(LEFT)->get_value()->first << std::endl;
-			if (_elem->get_child(RIGHT))
+			if (_elem->get_child(RIGHT) && _elem->get_child(RIGHT)->get_value())
 				std::cerr << "RIGHT_CHILD :" << _elem->get_child(RIGHT)->get_value()->first << std::endl;
-			if (_elem->get_brother())
+			if (_elem->get_brother() && _elem->get_brother()->get_value())
 				std::cerr << "BROTHER :" << _elem->get_brother()->get_value()->first << std::endl;
-			if (_elem->get_uncle())
-			std::cerr << "UNCLE :" << _elem->get_uncle()->get_value()->first << std::endl;
+			if (_elem->get_uncle() && _elem->get_uncle()->get_value())
+				std::cerr << "UNCLE :" << _elem->get_uncle()->get_value()->first << std::endl;
 			std::cerr << "SIDE :" << _elem->get_side() << std::endl;
 			std::cerr << std::endl;
 		}

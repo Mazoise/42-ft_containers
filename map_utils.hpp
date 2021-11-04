@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 11:31:05 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/29 15:54:59 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/04 13:00:28 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,19 +30,28 @@ class	element
 				typedef T		value_type;
 				typedef T*		pointer;
 		
-				element() : _value(0), _parent(0), _color(RED)
+				element() : _value(0), _parent(0), _color(BLACK)
 				{
 					_child[LEFT] = 0;
 					_child[RIGHT] = 0;
 				}
 				element(pointer value) : _value(value), _parent(0), _color(RED)
 				{
-					_child[LEFT] = 0;
-					_child[RIGHT] = 0;
+					_child[LEFT] = new element();
+					_child[LEFT]->set_parent(this);
+					_child[RIGHT] = new element();
+					_child[RIGHT]->set_parent(this);
 				}
 				element(const element &	rhs)
 				{
 					*this = rhs;
+				}
+				virtual ~element()
+				{
+					if (_child[LEFT] && !_child[LEFT]->get_value())
+						delete _child[LEFT];
+					if (_child[RIGHT] && !_child[RIGHT]->get_value())
+						delete _child[RIGHT];
 				}
 				element & operator=(const element & rhs)
 				{

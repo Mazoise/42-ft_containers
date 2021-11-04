@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/12 15:56:14 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/27 15:49:19 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/04 18:35:59 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,9 +70,10 @@ void		erase_tests(ft::map<int, std::string>	*test)
 	std::cout << "\"" << it->first << "\" : " << it->second << std::endl;
 	std::cout << "\"" << it2->first << "\" : " << it2->second << std::endl;
 	test->erase(it, it2);
+	std::cout << "coucou" << std::endl;
 	print_map<int, std::string>(*test);
-	test->erase(test->begin(), test->end());
-	print_map<int, std::string>(*test);
+	// test->erase(test->begin(), test->end());
+	// print_map<int, std::string>(*test);
 }
 
 ft::map<int, std::string> *		insert_tests()
@@ -80,6 +81,7 @@ ft::map<int, std::string> *		insert_tests()
 	std::cout << std::endl << "MAP TESTS" << std::endl;
 	ft::map<std::string, int> test;
 	test.insert(ft::make_pair<std::string, int>("Hello", 42));
+	std::cout << std::endl << "MAP TESTS" << std::endl;
 	print_map<std::string, int>(test);
 	ft::map<int, std::string> *test2 = new ft::map<int, std::string>();
 	test2->insert(ft::make_pair<int, std::string>(42, "Hello"));
