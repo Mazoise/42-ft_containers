@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:31:47 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/05 13:14:23 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 15:53:16 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <iostream>
 # include <ctime>
 # include <cstdlib>
+# include <sstream>
 
 # ifndef FT
 	#include <map>

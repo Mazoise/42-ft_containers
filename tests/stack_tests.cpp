@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/08 15:25:50 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/20 17:22:42 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 16:02:22 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,10 @@ void	print_stack(ft::stack<T, Container> &test)
 void	stack_tests(void)
 {
 	std::cout << std::endl << "STACK TESTS" << std::endl;
-	 ft::vector<Awesome> test(21, 12);
+	ft::vector<int> test_int(21, 12);
+	ft::stack<int,  ft::vector<int> > test_int2(test_int);
+	print_stack<int,  ft::vector<int> >(test_int2);
+	ft::vector<Awesome> test(21, 12);
 	ft::stack<Awesome,  ft::vector<Awesome> > test2(test);
 	print_stack<Awesome,  ft::vector<Awesome> >(test2);
 }

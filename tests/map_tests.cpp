@@ -6,11 +6,12 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/12 15:56:14 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/05 15:11:50 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 15:53:21 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes.hpp"
+#include <stdlib.h>
 
 template <class key, class value>
 void	print_map( ft::map<key, value> &test)
@@ -91,11 +92,9 @@ void		erase_tests(ft::map<T, std::string>	*test)
 template <class T>
 ft::map<T, std::string> *		insert_tests()
 {
-	std::cout << std::endl << "MAP TESTS" << std::endl;
 	typename ft::map<std::string, T> test;
 	test.insert(ft::make_pair<std::string, T>("Hello", 42));
 	print_map<std::string, T>(test);
-	std::cout << std::endl << "MAP TESTS" << std::endl;
 	typename ft::map<T, std::string> *test2 = new ft::map<T, std::string>();
 	test2->insert(ft::make_pair<T, std::string>(42, "Hello"));
 	print_map<T, std::string>(*test2);
@@ -114,6 +113,25 @@ ft::map<T, std::string> *		insert_tests()
 	test2->insert(ft::make_pair<T, std::string>(17, "Hello14"));
 	print_map<T, std::string>(*test2);
 	return (test2);
+}
+
+void							massive_tests()
+{
+	std::cout << std::endl << "MASSIVE TESTS" << std::endl;
+	ft::map<int, std::string> *test2 = new ft::map<int, std::string>();
+	std::string str;
+	for (int i = 0; i < 50000; i++)
+	{
+		std::stringstream ss;
+		ss << i;
+		str = ss.str();
+		test2->insert(ft::make_pair<int, std::string>(i, str));
+	}
+	print_map<int, std::string>(*test2);
+	for (int i = 49999; i >= 0; i--)
+		std::cout << (*test2)[i] << std::endl;
+	for (int i = 0; i < 50000; i++)
+		std::cout << (*test2)[i] << std::endl;
 }
 
 template <class T>
@@ -184,4 +202,5 @@ void	map_tests()
 	at_count_tests<Awesome>(test2);
 	erase_tests<Awesome>(test2);
 	relational_operator_tests<Awesome>();
+	massive_tests();
 }
