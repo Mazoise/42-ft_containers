@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:03:59 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/05 14:51:20 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 15:13:34 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,21 @@
 template <class T>
 void	print_vector( ft::vector<T> &test)
 {
-	typename  ft::vector<T>::iterator		beg = test.begin();
-	typename  ft::vector<T>::iterator		end = test.end();
+	typename  ft::vector<T>::const_iterator		beg = test.begin();
+	typename  ft::vector<T>::const_iterator		end = test.end();
+	typename  ft::vector<T>::const_reverse_iterator		rbeg = test.rbegin();
+	typename  ft::vector<T>::const_reverse_iterator		rend = test.rend();
 	std::cout << "size : " << test.size() << ", capacity : " << test.capacity() << std::endl;
-	for (typename  ft::vector<T>::iterator it = beg; it != end; it++)
+	for (typename  ft::vector<T>::const_iterator it = beg; it != end; it++)
 	{
 		std::cout << *it << " ";
 		if (((it - beg) % 10 == 9) && it > beg)
+			std::cout << std::endl;
+	}
+	for (typename  ft::vector<T>::const_reverse_iterator it = rbeg; it != rend; it++)
+	{
+		std::cout << *it << " ";
+		if (((it - rbeg) % 10 == 9) && it > rbeg)
 			std::cout << std::endl;
 	}
 	std::cout << std::endl;
