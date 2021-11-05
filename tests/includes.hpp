@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:31:47 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/12 16:02:45 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 13:14:23 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ class Awesome {
 
 		Awesome() : _n(42) { std::cout << "Default C " << std::endl; }
 		Awesome(int n) : _n(n) { std::cout << "Int C " << std::endl; (void)n; }
-		Awesome(Awesome const &rhs) : _n(42) { *this = rhs; std::cout << "Copy C " << std::endl; }
-		virtual ~Awesome() { std::cout << "D " << std::endl; }
+		Awesome(Awesome const &rhs) : _n(42) { *this = rhs; }
+		virtual ~Awesome() {}
 
 		Awesome &operator=(Awesome const & rhs) { _n = rhs._n; return (*this); }
 		bool operator==(Awesome const & rhs) const { return (_n == rhs._n); }

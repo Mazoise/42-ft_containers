@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/12 15:56:14 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/04 22:07:00 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 14:47:51 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,18 +30,6 @@ void	print_map( ft::map<key, value> &test)
 			std::cout << " - ";
 		i++;
 	}
-	beg--;
-	end--;
-	for (typename  ft::map<key, value>::const_iterator it = end; it != beg; it--)
-	{
-		std::cout << "\"" << it->first << "\" : " << it->second;
-		if (i % 5 == 4 || i == test.size() - 1)
-			std::cout << std::endl;
-		else
-			std::cout << " - ";
-		i++;
-	}
-	std::cout << std::endl;
 }
 
 void							at_count_tests(ft::map<int, std::string>	*test)
@@ -116,11 +104,71 @@ ft::map<int, std::string> *		insert_tests()
 	return (test2);
 }
 
+void	relational_operator_tests()
+{
+	ft::map<char,int> test1;
+	ft::map<char,int> test2;
+
+	test1['a']=100;
+	test1['b']=200;
+
+	test2['a']=100;
+	test2['b']=200;
+
+	// test1 ({{a,100},{b,200}}) vs test2 ({a,10},{z,1000}}):
+	if (test1 == test2)
+		std::cout << "test1 and test2 are equal\n";
+	if (test1 != test2)
+		std::cout << "test1 and test2 are not equal\n";
+	if (test1 < test2)
+		std::cout << "test1 is less than test2\n";
+	if (test1 > test2)
+		std::cout << "test1 is greater than test2\n";
+	if (test1 <= test2)
+		std::cout << "test1 is less than or equal to test2\n";
+	if (test1 >= test2)
+		std::cout << "test1 is greater than or equal to test2\n";
+
+	test1['a']=400;
+
+	// test1 ({{a,100},{b,200}}) vs test2 ({a,10},{z,1000}}):
+	if (test1 == test2)
+		std::cout << "test1 and test2 are equal\n";
+	if (test1 != test2)
+		std::cout << "test1 and test2 are not equal\n";
+	if (test1 < test2)
+		std::cout << "test1 is less than test2\n";
+	if (test1 > test2)
+		std::cout << "test1 is greater than test2\n";
+	if (test1 <= test2)
+		std::cout << "test1 is less than or equal to test2\n";
+	if (test1 >= test2)
+		std::cout << "test1 is greater than or equal to test2\n";
+
+	test1['a']=100;
+	test1['c']=20;
+
+	// test1 ({{a,100},{b,200}}) vs test2 ({a,10},{z,1000}}):
+	if (test1 == test2)
+		std::cout << "test1 and test2 are equal\n";
+	if (test1 != test2)
+		std::cout << "test1 and test2 are not equal\n";
+	if (test1 < test2)
+		std::cout << "test1 is less than test2\n";
+	if (test1 > test2)
+		std::cout << "test1 is greater than test2\n";
+	if (test1 <= test2)
+		std::cout << "test1 is less than or equal to test2\n";
+	if (test1 >= test2)
+		std::cout << "test1 is greater than or equal to test2\n";
+}
+
 void	map_tests()
 {
 	ft::map<int, std::string> * test = insert_tests();
 	at_count_tests(test);
 	erase_tests(test);
+	relational_operator_tests();
 	// std::cout << test.max_size() << std::endl;
 	// std::cout << test2.max_size() << std::endl;
 }

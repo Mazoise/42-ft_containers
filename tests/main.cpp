@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/08 15:17:12 by mchardin          #+#    #+#             */
-/*   Updated: 2021/10/22 09:45:08 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 13:36:42 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int main()
 {
-	// vector_tests();
-	// stack_tests();
+	vector_tests();
+	stack_tests();
 	map_tests();
 }

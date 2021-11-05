@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/04 22:40:50 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 14:32:04 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ class map
 		}
 		const_iterator begin() const
 		{
-			return const_iterator(begin());
+			return const_iterator(reinterpret_cast<element<const value_type> *>(_begin()));
 		}
 		iterator end()
 		{
@@ -150,7 +150,7 @@ class map
 		}
 		const_iterator end() const
 		{
-			return const_iterator(end());
+			return const_iterator(reinterpret_cast<element<const value_type> *>(_end()));
 		}
 		reverse_iterator rbegin()
 		{
@@ -215,7 +215,6 @@ class map
 		}
 		void erase(iterator pos)
 		{
-			std::cerr << "DEB erase pos" << std::endl;
 			if (_size > 1)
 				_delete(pos, _find(pos->first));
 			else
@@ -225,16 +224,12 @@ class map
 				delete _root;
 				_root = new element<value_type>();
 			}
-			std::cerr << "END erase pos" << std::endl;
 			_size--;
 		}
 		void erase(iterator first, iterator last)
 		{
-			if (first != last)
-				std::cerr << "erase range : now = " << first->first << " : " << first->second << std::endl;
 			iterator next = first;
 			iterator now;
-			std::cerr << "DEB erase range" << std::endl;
 			while (next != last)
 			{
 				now = first;
@@ -242,13 +237,11 @@ class map
 				next = first;
 				erase(now);
 			}
-			std::cerr << "END erase range" << std::endl;
 		}
 		size_type erase(const key_type& key)
 		{
 			element<value_type> *	del_elem = _find(key);
 
-			std::cerr << "DEB erase key " << key << std::endl;
 			if (!del_elem)
 				return 0;
 			if (_size > 1)
@@ -261,7 +254,6 @@ class map
 				_root = new element<value_type>();
 			}
 			_size--;
-			std::cerr << "FIN erase key" << std::endl;
 			return 1;
 		}
 		void swap(map& rhs)
@@ -317,79 +309,31 @@ class map
 		}
 		iterator lower_bound(const Key& key)
 		{
-			element<value_type> * tmp = _root;
-			bool					dir;
-
-			while (tmp && tmp->get_value())
-			{
-				if (tmp->get_value()->first == key)
-					return (iterator(tmp));
-				dir = key_compare()(tmp->get_value()->first, key);
-				if (tmp->get_child(dir) && tmp->get_child(dir)->get_value())
-					tmp = tmp->get_child(dir);
-				else if (dir == RIGHT)
-					return(iterator(tmp));
-				else
-					return(++iterator(tmp));
-			}
-			return(end());
+			for (iterator it = begin(); it != end(); it++)
+				if (!this->key_comp()(it->first, key))
+					return (it);
+			return (end());
 		}
 		const_iterator lower_bound(const Key& key) const
 		{
-			element<value_type> * tmp = _root;
-			bool					dir;
-
-			while (tmp && tmp->get_value())
-			{
-				if (tmp->get_value()->first == key)
-					return (const_iterator(tmp));
-				dir = key_compare()(tmp->get_value()->first, key);
-				if (tmp->get_child(dir) && tmp->get_child(dir)->get_value())
-					tmp = tmp->get_child(dir);
-				else if (dir == RIGHT)
-					return(const_iterator(tmp));
-				else
-					return(++const_iterator(tmp));
-			}
-			return(end());
+			for (const_iterator it = begin(); it != end(); it++)
+				if (!this->key_comp()(it->first, key))
+					return (it);
+			return (end());
 		}
 		iterator upper_bound(const Key& key)
 		{
-			element<value_type> * tmp = _root;
-			bool					dir;
-
-			while (tmp && tmp->get_value())
-			{
-				if (tmp->get_value()->first == key)
-					return (++iterator(tmp));
-				dir = key_compare()(tmp->get_value()->first, key);
-				if (tmp->get_child(dir) && tmp->get_child(dir)->get_value())
-					tmp = tmp->get_child(dir);
-				else if (dir == RIGHT)
-					return(iterator(tmp));
-				else
-					return(++iterator(tmp));
-			}
-			return(end());
+			for (iterator it = begin(); it != end(); it++)
+				if (this->key_comp()(key, it->first))
+					return (it);
+			return (end());
 		}
 		const_iterator upper_bound(const Key& key) const
 		{
-			element<value_type> * tmp = _root;
-			bool					dir;
-
-			while (tmp && tmp->get_value())
-			{
-				if (tmp->get_value()->first == key)
-					return (++const_iterator(tmp));
-				dir = key_compare()(tmp->get_value()->first, key);
-				if (tmp->get_child(dir) && tmp->get_child(dir)->get_value())
-					tmp = tmp->get_child(dir);
-				else if (dir == RIGHT)
-					return(const_iterator(tmp));
-				else
-					return(++const_iterator(tmp));
-			}
-			return(end());
+			for (const_iterator it = begin(); it != end(); it++)
+				if (this->key_comp()(key, it->first))
+					return (it);
+			return (end());
 		}
 
 		key_compare key_comp() const
@@ -448,13 +392,8 @@ class map
 		
 		void	_rotate(element<value_type> * rhs, bool dir)
 		{
-			
-			std::cerr << "beg rotate" << std::endl;
 			if (!rhs)
-			{
-				std::cerr << "SNH" << std::endl;
 				return ;
-			}
 			element<value_type> * tmp = rhs->get_child(!dir);
 			rhs->set_child(tmp->get_child(dir), !dir);
 			tmp->get_child(dir)->set_parent(rhs);
@@ -466,7 +405,6 @@ class map
 				rhs->get_parent()->set_child(tmp, rhs->get_side());
 			tmp->set_child(rhs, dir);
 			rhs->set_parent(tmp);
-			std::cerr << "end rotate" << std::endl;
 		}
 		void	_simple_insert(element<value_type> * new_elem)
 		{
@@ -539,15 +477,12 @@ class map
 				w = x->get_brother();
 				if (w->get_color() == RED)
 				{
-					std::cerr << "W is red" << std::endl;
 					w->set_color(BLACK);
 					x->get_parent()->set_color(RED);
 					_rotate(x->get_parent(), x->get_side());
-					std::cerr << "Bijour" << std::endl;
 				}
 				else if (w->get_value() && w->get_child(x->get_side())->get_color() == BLACK && w->get_child(w->get_side())->get_color() == BLACK)
 				{
-					std::cerr << "W children black - black" << std::endl;
 					w->set_color(RED);
 					x = x->get_parent();
 				}
@@ -555,13 +490,11 @@ class map
 				{
 					if (w->get_value() && w->get_child(w->get_side())->get_color() == BLACK)
 					{
-						std::cerr << "W children red - black" << std::endl;
 						w->get_child(x->get_side())->set_color(BLACK);
 						w->set_color(RED);
 						_rotate(w, w->get_side());
 						w = x->get_brother();
 					}
-					std::cerr << "W children black - red or red - red" << std::endl;
 					w->set_color(x->get_parent()->get_color());
 					x->get_parent()->set_color(BLACK);
 					if (w->get_value())
@@ -587,13 +520,10 @@ class map
 		{
 			element<value_type> *	x;
 			bool					dir;
-			if (!del_node)
-				std::cerr << "SNH no del node" << std::endl;
 			bool					y_original_color = del_node->get_color();
 
 			if (!del_node->get_child(RIGHT)->get_value() || !del_node->get_child(LEFT)->get_value())
 			{
-				std::cerr << "Not 2 children" << std::endl;
 				if (!del_node->get_child(RIGHT)->get_value())
 					dir = LEFT;
 				else
@@ -604,7 +534,6 @@ class map
 			}
 			else
 			{
-				std::cerr << "2 children" << std::endl;
 				del_it++;
 				element<value_type> *	repl_node = _find(del_it->first);
 				y_original_color = repl_node->get_color();
@@ -613,9 +542,8 @@ class map
 					x->set_parent(repl_node);
 				else
 				{
-					_transplant(repl_node, x); // rejoindre le gosses du repl_node dans la chaine a sa place
+					_transplant(repl_node, x);
 					repl_node->set_child(0, RIGHT);
-					// _print_node(repl_node);
 					repl_node->set_child(del_node->get_child(RIGHT), RIGHT);
 					repl_node->get_child(RIGHT)->set_parent(repl_node);
 					del_node->set_child(0, RIGHT);
@@ -633,28 +561,6 @@ class map
 			delete del_node;
 			if (y_original_color == BLACK)
 				_correct(x);
-			// for (iterator it = begin(); it != end(); it++)
-			// 	_print_node(_find(it->first));
-		}
-
-		void	_print_node(element<value_type> *	_elem)
-		{
-			if (!_elem)
-				return ;
-			if (_elem->get_value())
-			std::cerr << "ME :" << _elem->get_value()->first << std::endl;
-			if (_elem->get_parent())
-				std::cerr << "PARENT :" << _elem->get_parent()->get_value()->first << std::endl;
-			if (_elem->get_child(LEFT) && _elem->get_child(LEFT)->get_value())
-				std::cerr << "LEFT_CHILD :" << _elem->get_child(LEFT)->get_value()->first << std::endl;
-			if (_elem->get_child(RIGHT) && _elem->get_child(RIGHT)->get_value())
-				std::cerr << "RIGHT_CHILD :" << _elem->get_child(RIGHT)->get_value()->first << std::endl;
-			if (_elem->get_brother() && _elem->get_brother()->get_value())
-				std::cerr << "BROTHER :" << _elem->get_brother()->get_value()->first << std::endl;
-			if (_elem->get_uncle() && _elem->get_uncle()->get_value())
-				std::cerr << "UNCLE :" << _elem->get_uncle()->get_value()->first << std::endl;
-			std::cerr << "SIDE :" << _elem->get_side() << std::endl;
-			std::cerr << std::endl;
 		}
 };
 
@@ -696,8 +602,11 @@ bool operator>=( const map<Key,T,Compare,Alloc>& lhs, const map<Key,T,Compare,Al
 	return (!(lhs < rhs));
 }
 
-// template<class Key, class T, class Compare, class Alloc>
-// void swap(map<Key,T,Compare,Alloc>& lhs, map<Key,T,Compare,Alloc>& rhs);
+template<class Key, class T, class Compare, class Alloc>
+void swap(map<Key,T,Compare,Alloc>& lhs, map<Key,T,Compare,Alloc>& rhs)
+{
+	lhs.swap(rhs);
+}
 
 }
 

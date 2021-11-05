@@ -4,3 +4,6 @@ FT_CONTAINERS_TESTER
 test_res
 my_res
 diff
+my_s_res
+test_s_res
+vector_swap_fail.hpp

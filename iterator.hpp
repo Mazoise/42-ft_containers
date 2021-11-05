@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/16 16:13:26 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/03 17:16:03 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 13:36:18 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,13 +125,13 @@ class reverse_iterator
 		reverse_iterator operator++(int)
 		{
 			reverse_iterator tmp = *this;
-			--(*this);
+			++(*this);
 			return (tmp);
 		}
 		reverse_iterator operator--(int)
 		{
 			reverse_iterator tmp = *this;
-			++(*this);
+			--(*this);
 			return (tmp);
 		}
 		reverse_iterator operator+( difference_type n ) const
