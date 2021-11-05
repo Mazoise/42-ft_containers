@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/05 11:48:07 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/05 14:30:32 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 15:22:06 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ class map_iterator : public iterator<bidirectional_iterator_tag, T>
 		typedef bidirectional_iterator_tag			iterator_category;
 
 		map_iterator(void) : _elem(0) {}
-		// map_iterator(element<value_type> & elem) : _elem(&elem) {}
 		map_iterator(element<value_type> * elem) : _elem(elem) {}
 		map_iterator(const map_iterator& rhs) : _elem(rhs._elem) {}
 		virtual ~map_iterator(void) {}

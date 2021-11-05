@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/05 14:32:04 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 15:21:10 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,9 @@ class map
 
 	public :
 
-		class value_compare : public std::binary_function<value_type, value_type, bool> // recode binary function?
+		class value_compare : public std::binary_function<value_type, value_type, bool>
 		{
-			friend class map; // allowed?
+			friend class map;
 			public :
 				typedef bool							result_type;
 				typedef value_type						first_argument_type;
@@ -205,7 +205,7 @@ class map
 			return res.first;
 		}
 		template<class InputIt>
-		void insert(InputIt first, typename ft::enable_if<!isIntegral<InputIt>::value, InputIt>::type last) // add enable if 
+		void insert(InputIt first, typename ft::enable_if<!isIntegral<InputIt>::value, InputIt>::type last)
 		{
 			while(first != last)
 			{
@@ -419,7 +419,7 @@ class map
 			}
 			while (i->get_value())
 			{
-				dir = value_compare(_comp)(*(i->get_value()), *(new_elem->get_value())); // check order
+				dir = value_compare(_comp)(*(i->get_value()), *(new_elem->get_value()));
 				if (i->get_child(dir) && i->get_child(dir)->get_value())
 					i = i->get_child(dir);
 				else
@@ -516,7 +516,7 @@ class map
 			rep_elem->set_parent(del_elem->get_parent());
 		}
 
-		void	_delete(iterator del_it, element<value_type> * del_node) //returns replacement node
+		void	_delete(iterator del_it, element<value_type> * del_node)
 		{
 			element<value_type> *	x;
 			bool					dir;

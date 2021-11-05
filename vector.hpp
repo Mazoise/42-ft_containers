@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:01:06 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/03 20:17:05 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 15:19:57 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,7 +246,7 @@ class vector
 			_size -= len;
 			return first;
 		}
-		void swap (vector& x) //swap with other vector !
+		void swap (vector& x)
 		{
 			pointer			tmp_value;
 			size_type			tmp;
@@ -262,7 +262,7 @@ class vector
 			x._value = tmp_value;
 		}
 
-		void clear (void) //_alloc.destroy?
+		void clear (void)
 		{
 			erase(begin(), end());
 		}
