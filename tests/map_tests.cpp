@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/12 15:56:14 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/05 15:53:21 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 17:01:23 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,7 @@ void							massive_tests()
 		std::cout << (*test2)[i] << std::endl;
 	for (int i = 0; i < 50000; i++)
 		std::cout << (*test2)[i] << std::endl;
+	delete test2;
 }
 
 template <class T>
@@ -147,60 +148,90 @@ void	relational_operator_tests()
 	test2['b']=200;
 
 	if (test1 == test2)
-		std::cout << "test1 and test2 are equal\n";
+		std::cout << "test1 and test2 are equal" << std::endl;
 	if (test1 != test2)
-		std::cout << "test1 and test2 are not equal\n";
+		std::cout << "test1 and test2 are not equal" << std::endl;
 	if (test1 < test2)
-		std::cout << "test1 is less than test2\n";
+		std::cout << "test1 is less than test2" << std::endl;
 	if (test1 > test2)
-		std::cout << "test1 is greater than test2\n";
+		std::cout << "test1 is greater than test2" << std::endl;
 	if (test1 <= test2)
-		std::cout << "test1 is less than or equal to test2\n";
+		std::cout << "test1 is less than or equal to test2" << std::endl;
 	if (test1 >= test2)
-		std::cout << "test1 is greater than or equal to test2\n";
+		std::cout << "test1 is greater than or equal to test2" << std::endl;
 
 	test1['a']=400;
 
 	if (test1 == test2)
-		std::cout << "test1 and test2 are equal\n";
+		std::cout << "test1 and test2 are equal" << std::endl;
 	if (test1 != test2)
-		std::cout << "test1 and test2 are not equal\n";
+		std::cout << "test1 and test2 are not equal" << std::endl;
 	if (test1 < test2)
-		std::cout << "test1 is less than test2\n";
+		std::cout << "test1 is less than test2" << std::endl;
 	if (test1 > test2)
-		std::cout << "test1 is greater than test2\n";
+		std::cout << "test1 is greater than test2" << std::endl;
 	if (test1 <= test2)
-		std::cout << "test1 is less than or equal to test2\n";
+		std::cout << "test1 is less than or equal to test2" << std::endl;
 	if (test1 >= test2)
-		std::cout << "test1 is greater than or equal to test2\n";
+		std::cout << "test1 is greater than or equal to test2" << std::endl;
 
 	test1['a']=100;
 	test1['c']=20;
 
 	if (test1 == test2)
-		std::cout << "test1 and test2 are equal\n";
+		std::cout << "test1 and test2 are equal" << std::endl;
 	if (test1 != test2)
-		std::cout << "test1 and test2 are not equal\n";
+		std::cout << "test1 and test2 are not equal" << std::endl;
 	if (test1 < test2)
-		std::cout << "test1 is less than test2\n";
+		std::cout << "test1 is less than test2" << std::endl;
 	if (test1 > test2)
-		std::cout << "test1 is greater than test2\n";
+		std::cout << "test1 is greater than test2" << std::endl;
 	if (test1 <= test2)
-		std::cout << "test1 is less than or equal to test2\n";
+		std::cout << "test1 is less than or equal to test2" << std::endl;
 	if (test1 >= test2)
-		std::cout << "test1 is greater than or equal to test2\n";
+		std::cout << "test1 is greater than or equal to test2" << std::endl;
+}
+
+template <class T>
+void	bound_tests(ft::map<T, std::string>	*test)
+{
+	ft::pair<typename ft::map<T, std::string>::iterator, typename ft::map<T, std::string>::iterator> ret;
+	ret = test->equal_range(42);
+
+	std::cout << "Lower bound";
+	std::cout << "\"" << ret.first->first << "\" : " << ret.first->second << std::endl;
+
+	std::cout << "Upper bound";
+	std::cout << "\"" << ret.second->first << "\" : " << ret.second->second << std::endl;
+}
+
+template <class T>
+void	copy_swap_tests(ft::map<T, std::string>	*test)
+{
+	typename ft::map<T, std::string>	test2(*test);
+	print_map<T, std::string>(test2);
+	test->erase(42);
+	test->erase(72);
+	test->erase(6);
+	swap(*test, test2);
+	print_map<T, std::string>(test2);
+	print_map<T, std::string>(*test);
 }
 
 void	map_tests()
 {
 	ft::map<int, std::string> * test = insert_tests<int>();
 	at_count_tests<int>(test);
-	erase_tests<int>(test);
 	relational_operator_tests<int>();
-
+	bound_tests<int>(test);
+	copy_swap_tests<int>(test);
+	erase_tests<int>(test);
 	ft::map<Awesome, std::string> * test2 = insert_tests<Awesome>();
 	at_count_tests<Awesome>(test2);
-	erase_tests<Awesome>(test2);
 	relational_operator_tests<Awesome>();
+	bound_tests<Awesome>(test2);
+	copy_swap_tests<Awesome>(test2);
+	erase_tests<Awesome>(test2);
 	massive_tests();
+	delete test;
 }

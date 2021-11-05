@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/03 19:00:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/11/05 15:21:10 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/11/05 17:00:48 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,25 +79,26 @@ class map
 		template<class InputIt>
 		map(InputIt first, typename ft::enable_if<!isIntegral<InputIt>::value, InputIt>::type last, const Compare& comp = Compare(), const Allocator& alloc = Allocator())  : _size(0), _comp(comp),_alloc(alloc)
 		{
-			clear();
+			_root = new element<value_type>();
 			insert(first, last);
 		}
-		map(const map& rhs)
+		map(const map& rhs) : _size(0)
 		{
+			_root = new element<value_type>();
 			*this = rhs;
 		}
 		~map()
 		{
-			clear();
+			if (_size)
+				clear();
 			delete _root;
 		}
 		map& operator=(const map& rhs)
 		{
 			if (&rhs != this)
 			{
-				_alloc = rhs._alloc;
-				_comp = rhs._comp;
-				clear();
+				if (_size)
+					clear();
 				insert(rhs.begin(), rhs.end());
 			}
 			return *this;
@@ -260,21 +261,13 @@ class map
 		{
 			element<value_type> *	tmp_root;
 			size_type				tmp_size;
-			key_compare				tmp_comp;
-			allocator_type			tmp_alloc;
 
-			tmp_comp = _comp;
-			_comp = rhs._comp;
-			rhs._comp = tmp_comp;
 			tmp_root = _root;
 			_root = rhs._root;
 			rhs._root = tmp_root;
 			tmp_size = _size;
 			_size = rhs._size;
 			rhs._size = tmp_size;
-			tmp_alloc = _alloc;
-			_alloc = rhs._alloc;
-			rhs._alloc = tmp_alloc;
 		}
 
 		size_type count(const Key& key) const
