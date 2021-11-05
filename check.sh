@@ -21,5 +21,5 @@ fi
 
 echo -e "\033[0m"
 
-# rm -f test_res my_res
+rm -f test_res my_res
 rm -f **.o ft_containers std_containers
