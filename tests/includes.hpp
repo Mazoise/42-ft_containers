@@ -18,6 +18,7 @@
 # include <ctime>
 # include <cstdlib>
 # include <sstream>
+# include <algorithm>
 
 # ifndef FT
 	#include <map>
@@ -36,8 +37,8 @@ class Awesome {
 
 		Awesome() : _n(42) { std::cout << "Default C " << std::endl; }
 		Awesome(int n) : _n(n) { std::cout << "Int C " << std::endl; (void)n; }
-		Awesome(Awesome const &rhs) : _n(42) { *this = rhs; }
-		virtual ~Awesome() {}
+		Awesome(Awesome const &rhs) : _n(42) {  std::cout << "Copy C " << std::endl; *this = rhs; }
+		virtual ~Awesome() { std::cout << "D " << std::endl; }
 
 		Awesome &operator=(Awesome const & rhs) { _n = rhs._n; return (*this); }
 		bool operator==(Awesome const & rhs) const { return (_n == rhs._n); }

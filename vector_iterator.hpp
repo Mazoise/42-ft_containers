@@ -20,7 +20,7 @@ namespace ft
 {
 
 template < class T>
-class vector_iterator : public iterator<random_access_iterator_tag, T>
+class vector_iterator : public ft::iterator<std::random_access_iterator_tag, T>
 {
 	public :
 
@@ -28,7 +28,7 @@ class vector_iterator : public iterator<random_access_iterator_tag, T>
 		typedef T									value_type;
 		typedef T*									pointer;
 		typedef T&									reference;
-		typedef random_access_iterator_tag			iterator_category;
+		typedef typename ft::iterator<std::random_access_iterator_tag, T>::iterator_category			iterator_category;
 
 		vector_iterator(void) : _value(0) {}
 		vector_iterator(reference value) : _value(&value) {}

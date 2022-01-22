@@ -201,28 +201,48 @@ class vector
 		{ erase(end() - 1); }
 		iterator insert (iterator position, const_reference val)
 		{
-			position = _prepare_insert(position, 1, val);
-			*position = val;
-			_destroy_dealloc_old();
-			return(position);
+			size_type		diff = position - begin();
+
+			// if (_size == _capacity)
+			insert(position, 1, val);
+			// else
+			// 	insert(position, 1, value_type(val));
+			// std::cerr << "INSERTING " << val << " at index " << diff << std::endl;
+			return(begin() + diff);
 		}
 		void insert (iterator position, size_type n, const_reference val)
 		{
-			position = _prepare_insert(position, n, val);
-			for (iterator it = position; it != position + n; it++)
-				*it = val;
+			size_type		diff = position - begin();
+			bool			new_alloc = _prepare_insert(diff, n);
+
+			for (size_type i = diff; i < diff + n; i++)
+			{
+				// std::cerr << "INSERTING " << val << " at index " << i << std::endl;
+				if (i < _size && !new_alloc)
+					_value[i] = val;
+				else
+					_alloc.construct(&_value[i], val);
+			}
+			_size += n;
 			_destroy_dealloc_old();
 		}
 		template <class InputIterator>
 		void insert (iterator position, InputIterator first, typename ft::enable_if<!isIntegral<InputIterator>::value, InputIterator>::type last)
 		{
-			size_type	len = last - first;
-			position = _prepare_insert(position, len, *first);
-			for (iterator it = position; first != last; it++)
+			size_type		diff = position - begin();
+			size_type		n = last - first;
+			bool			new_alloc = _prepare_insert(diff, n);
+
+			for (size_type i = diff; i < diff + n; i++)
 			{
-				*it = *first;
+				// std::cerr << "INSERTING " << *first << " at index " << i << std::endl;
+				if (i < _size && !new_alloc)
+					_value[i] = *first;
+				else
+					_alloc.construct(&_value[i], *first);
 				first++;
 			}
+			_size += n;
 			_destroy_dealloc_old();
 		}
 		iterator erase (iterator position)
@@ -277,7 +297,7 @@ class vector
 		size_type												_old_size;
 		size_type												_old_capacity;
 
-		void	_reserve_no_destroy(size_type n)
+		void	_reserve_no_destroy_move(size_type n, size_type diff, size_type n_new)
 		{
 			if (n > _alloc.max_size())
 				throw (std::length_error("vector::reserve"));
@@ -286,15 +306,32 @@ class vector
 				_save_old();
 				_value = &_alloc.allocate(n + 2)[1];
 
-				if (_capacity)
+				if (_capacity && _size)
 				{
-					for (size_type i = 0; i < _size; i++)
+					for (size_type i = 0; i < diff; i++)
 					{
 						_alloc.construct(&_value[i], _old_value[i]);
+					}
+					for (size_type i = _size - 1; i >= diff; i--)
+					{
+						// std::cerr << "OLD VALUE : " << _old_value[i] << " PUT AT INDEX " << i + n_new << " FROM INDEX " << i << std::endl;
+						_alloc.construct(&_value[i + n_new], _old_value[i]);
+						if (!i)
+							break;
 					}
 				}
 				_capacity = n;
 			}
+			else if (_size)
+				for (size_type i = _size - 1; i >= diff; i--)
+				{
+					if (i + n_new < _size)
+						_value[i + n_new] = _value[i];
+					else
+						_alloc.construct(&_value[i + n_new], _value[i]);
+					if (!i)
+							break;
+				}
 		}
 		void	_save_old(void)
 		{
@@ -302,13 +339,14 @@ class vector
 			_old_capacity = _capacity;
 			_old_size = _size;
 		}
-
 		void	_destroy_dealloc_old()
 		{
+				// std::cerr << "HELLO ???" << std::endl;
 			if (_old_capacity)
 			{
 				for (size_type i = 0; i < _old_size; i++)
 				{
+					// std::cerr << "AT INDEX " << i << " DESTROYING " << _old_value[i] << std::endl;
 					_alloc.destroy(&_old_value[i]);
 				}
 				if (_old_capacity < _capacity)
@@ -316,29 +354,22 @@ class vector
 				_old_capacity = 0;
 			}
 		}
-
-		iterator	_prepare_insert(iterator position, size_type n, value_type val)
+		bool	_prepare_insert(size_type diff, size_type n)
 		{
-			size_type		diff = position - begin();
-
+			bool	new_alloc = false;
 			if (_capacity < _size + n)
 			{
 				if (n == 1 && !_size)
-					_reserve_no_destroy(1);
+					_reserve_no_destroy_move(1, diff, n);
 				else if (_size << 1 < _size + n)
-					_reserve_no_destroy(_size + n);
+					_reserve_no_destroy_move(_size + n, diff, n);
 				else
-					_reserve_no_destroy(_size << 1);
-				position = begin() + diff;
+					_reserve_no_destroy_move(_size << 1, diff, n);
+				new_alloc = true;
 			}
-			for (size_type i = _size; i < _size + n; i++)
-				_alloc.construct(&_value[i], val);
-			for (size_type i = _size + n - 1; i > diff + n - 1; i--)
-			{
-				_value[i] = _value[i - n];
-			}
-			_size += n;
-			return position;
+			else
+				_reserve_no_destroy_move(0, diff, n);
+			return new_alloc;
 		}
 };
 

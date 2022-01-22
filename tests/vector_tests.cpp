@@ -17,8 +17,8 @@ void	print_vector( ft::vector<T> &test)
 {
 	typename  ft::vector<T>::const_iterator		beg = test.begin();
 	typename  ft::vector<T>::const_iterator		end = test.end();
-	typename  ft::vector<T>::const_reverse_iterator		rbeg = test.rbegin();
-	typename  ft::vector<T>::const_reverse_iterator		rend = test.rend();
+	// typename  ft::vector<T>::const_reverse_iterator		rbeg = test.rbegin();
+	// typename  ft::vector<T>::const_reverse_iterator		rend = test.rend();
 	std::cout << "size : " << test.size() << ", capacity : " << test.capacity() << std::endl;
 	for (typename  ft::vector<T>::const_iterator it = beg; it != end; it++)
 	{
@@ -26,12 +26,12 @@ void	print_vector( ft::vector<T> &test)
 		if (((it - beg) % 10 == 9) && it > beg)
 			std::cout << std::endl;
 	}
-	for (typename  ft::vector<T>::const_reverse_iterator it = rbeg; it != rend; it++)
-	{
-		std::cout << *it << " ";
-		if (((it - rbeg) % 10 == 9) && it > rbeg)
-			std::cout << std::endl;
-	}
+	// for (typename  ft::vector<T>::const_reverse_iterator it = rbeg; it != rend; it++)
+	// {
+	// 	std::cout << *it << " ";
+	// 	if (((it - rbeg) % 10 == 9) && it > rbeg)
+	// 		std::cout << std::endl;
+	// }
 	std::cout << std::endl;
 }
 
@@ -82,6 +82,7 @@ void	insert_tests()
 	 ft::vector<T> test(1, 1);
 	 ft::vector<T> test2(5, 5);
 
+	test.reserve(10);
 	test.insert(test.begin(), 70);
 	print_vector<T>(test);
 	test.insert(test.begin(), 200, 12);
@@ -139,7 +140,7 @@ void	reserve_tests(void)
 	}
 	print_vector<T>(test);
 }
-
+ 
 template <class T>
 void	copy_swap_tests(void)
 {
@@ -224,9 +225,9 @@ void	awesome_tests(void)
 	print_vector<Awesome>(test);
 	 ft::vector<Awesome> test2;
 	print_vector<Awesome>(test2);
-	test2.push_back(12);
-	test2.push_back(8);
-	test2.push_back(16);
+	// test2.push_back(12);
+	// test2.push_back(8);
+	// test2.push_back(16);
 	print_vector<Awesome>(test2);
 	std::cout << "SAME ?" << (test.begin() + 1 == test2.begin() + 1) << std::endl;
 	test.assign(test2.begin(), test2.end());
@@ -261,6 +262,16 @@ void			vector_massive_tests()
 		std::cout << (*test2)[i] << std::endl;
 }
 
+template <class T>
+void	stl_tests()
+{
+	ft::vector<T> test;
+
+	for (size_t i = 0; i < 51; i++)
+		test.push_back(i);
+	std::cout << *(std::find<typename ft::vector<T>::iterator, T>(test.begin(), test.end(), 12)) << std::endl;
+}
+
 void	vector_tests()
 {
 	std::cout << std::endl << "VECTOR TESTS : INT" << std::endl;
@@ -281,5 +292,6 @@ void	vector_tests()
 	reverse_it_tests<Awesome>();
 	erase_clear_tests<Awesome>();
 	awesome_tests();
-	vector_massive_tests();
+	// vector_massive_tests();
+	stl_tests<int>();
 }

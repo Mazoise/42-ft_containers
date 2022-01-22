@@ -15,6 +15,6 @@
 int main()
 {
 	vector_tests();
-	stack_tests();
-	map_tests();
+	// stack_tests();
+	// map_tests();
 }
